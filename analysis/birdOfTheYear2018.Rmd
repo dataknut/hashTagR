@@ -1,0 +1,239 @@
+---
+params:
+  hashtag: '#birdoftheyear OR #boty' # <- for a different string just edit this & re-run
+title: 'Twitter hashtag analysis: `r params$hashtag`'
+author: "Ben Anderson (`@dataknut`)"
+date: 'Last run at: `r Sys.time()`'
+output:
+  html_document:
+    keep_md: yes
+    number_sections: yes
+    self_contained: no
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+bibliography: '`r path.expand("~/bibliography.bib")`'
+---
+```{r knitrSetUp, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE) # do not echo code
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(fig_caption = TRUE)
+knitr::opts_chunk$set(fig_height = 6) # default, make it bigger to stretch vertical axis
+knitr::opts_chunk$set(fig_width = 8) # full width
+knitr::opts_chunk$set(tidy = TRUE) # tidy up code in case echo = TRUE
+```
+
+```{r codeSetup, include=FALSE}
+
+# Set start time ----
+startTime <- proc.time()
+
+library(hashTagR)
+
+# default code location - needed to load functions & parameters correctly so 
+projLoc <- hashTagR::findParentDirectory("hashTagR")
+
+# Libraries ----
+
+# additional libs required by this code
+reqLibs <- c("ggplot2", "data.table", "knitr", "readr")
+
+print(paste0("Loading the following libraries: ", reqLibs))
+# Use Luke's function to require/install/load
+hashTagR::loadLibraries(reqLibs)
+```
+
+```{r set parameters}
+dPath <- "~/Data/twitter/"
+
+```
+
+
+# Purpose
+
+To extract and visualise tweets and re-tweets of `r params$hashtag` in September/October 2018.
+
+Borrowing extensively from https://github.com/mkearney/rtweet
+
+Th anaysis used `rtweet` to ask the Twitter search API to extract 'all' tweets with the `r params$hashtag` hashtag in the '[recent](https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets)' twitterVerse. 
+
+It is therefore possible that not quite all tweets have been extracted although it seems likely that we have captured most recent `human` tweeting which was the main intention. Future work should instead use the Twitter [streaming API](https://dev.twitter.com/streaming/overview).
+
+# Load Data
+
+Load the data (pre-collected using ).
+
+```{r load Data}
+# load from pre-collected ----
+
+twDT <- data.table::as.data.table(hashTagR::loadTweets(dPath, params$hashtag)) # we like data.tables
+
+twDT <- twDT[, ba_obsDate := lubridate::date(created_at)]
+twDT <- twDT[, ba_obsTime := hms::as.hms(created_at)] # this will auto-convert to local time
+
+names(twDT)
+```
+
+The table has `r tidyNum(nrow(twDT))` tweets (including `r tidyNum(nrow(twDT[is_quote == "TRUE"]))` quotes and `r tidyNum(nrow(twDT[is_retweet == "TRUE"]))` re-tweets) from `r tidyNum(uniqueN(twDT$screen_name))` tweeters between `r min(twDT$ba_obsDate)` and `r max(twDT$ba_obsDate)`.
+
+# Analysis
+
+## Tweets and Tweeters over time
+
+```{r setCaptionTimeSeries}
+myCaption <- paste0("All (re)tweets and quotes containing ", params$hashtag, 
+                      min(as.Date(twDT$ba_obsDate)),
+                          " to ",
+                          max(as.Date(twDT$ba_obsDate))
+                          )
+```
+
+```{r allDaysChart, fig.height=8, fig.width=9, fig.cap=myCaption}
+
+twDT <- twDT[, ba_tweetType := "Tweet"]
+twDT <- twDT[is_retweet == TRUE, ba_tweetType := "Re-tweet"]
+twDT <- twDT[is_quote == TRUE, ba_tweetType := "Quote"]
+
+plotDT <- twDT[, .(
+                 nTweets = .N,
+                 nTweeters = uniqueN(screen_name)
+               ), keyby = .(ba_obsDate, ba_tweetType)]
+
+  myPlot <- ggplot(plotDT, aes(x = ba_obsDate)) +
+    geom_line(aes(y = nTweets, colour = "N tweets")) +
+    geom_line(aes(y = nTweeters, colour = "N tweeters")) +
+    facet_grid(ba_tweetType ~ .) +
+    theme(strip.text.y = element_text(size = 9, colour = "black", angle = 90)) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.5)) +
+    theme(legend.position = "bottom") +
+    theme(legend.title = element_blank()) +
+    labs(caption = myCaption,
+         x = "Date",
+         y = "Count"
+    )
+
+myPlot
+
+#ggplotly(myPlot)
+```
+
+
+## Screen name
+
+Next we'll try by screen name.
+
+Here's a really bad visualisation of all tweeters tweeting over time. Each row of pixels is a tweeter (the names are probably illegible) and a green dot indicates a few tweets in the half hour while a red dot indicates a lot of tweets.
+
+```{r screenNameAll, fig.height=8,fig.cap="N tweets per day minutes by screen name"}
+
+plotDT <- twDT[, 
+                    .(
+                      nTweets = .N
+                    ), by = .(screen_name, ba_obsDate)]
+
+myPlot <- ggplot(plotDT, aes(x = ba_obsDate)) +
+    geom_tile(aes(y = screen_name, fill = nTweets)) +
+    theme(strip.text.y = element_text(size = 9, colour = "black", angle = 0)) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.5)) +
+    #scale_x_reverse() + # fix reverse plotting of long
+    scale_x_date(date_breaks = "1 day") +
+    scale_fill_gradient(low="green", high = "red") +
+    theme(legend.position = "bottom") +
+    theme(legend.title = element_blank()) +
+    labs(caption = myCaption,
+         x = "Date",
+         y = "Screen name"
+    )
+
+myPlot
+```
+
+Yeah, that worked well.
+
+So let's re-do that for the top 50 tweeters so we can see their tweetStreaks...
+
+Top tweeters:
+
+```{r topTweeters}
+allTweetersDT <- twDT[, .(nTweets = .N), by = screen_name][order(-nTweets)]
+
+kable(caption = "Top 15 tweeters (all days)",
+      head(allTweetersDT, 15)
+      )
+```
+
+And their tweetStreaks...
+
+```{r screenNameTop50, fig.height=8,fig.cap="N tweets per day minutes by screen name (top 50, reverse alphabetical)"}
+myCaption <- paste0("All (re)tweets containing ", params$hashtag, 
+                      min(as.Date(twDT$ba_obsDate)),
+                          " to ",
+                          max(as.Date(twDT$ba_obsDate)),
+                    "\nReverse alphabetical"
+                          )
+
+matchDT <- head(allTweetersDT,50)
+matchDT <- matchDT[, maxT := nTweets]
+setkey(matchDT, screen_name)
+setkey(twDT, screen_name)
+
+tempDT <- merge(twDT, matchDT)
+
+plotDT <- tempDT[matchDT, 
+                    .(
+                      nTweets = .N
+                    ), keyby = .(maxT,screen_name,ba_obsDate)]
+
+plotDT <- plotDT[order(plotDT$screen_name,plotDT$maxT)]
+
+myPlot <- ggplot(plotDT, aes(x = ba_obsDate)) +
+    geom_tile(aes(y = screen_name, fill = nTweets)) +
+    theme(strip.text.y = element_text(size = 9, colour = "black", angle = 0)) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.5)) +
+    #scale_x_reverse() + # fix reverse plotting of long
+    scale_x_date(date_breaks = "1 day") +
+    scale_fill_gradient(low="green", high = "red") +
+    theme(legend.position = "bottom") +
+    theme(legend.title = element_blank()) +
+    labs(caption = myCaption,
+         x = "Date",
+         y = "Screen name"
+    )
+
+#ggplotly(myPlot)
+
+myPlot 
+```
+
+Any twitterBots...?
+
+# About
+
+```{r check runtime}
+t <- proc.time() - startTime
+
+elapsed <- t[[3]]
+```
+
+Analysis completed in `r elapsed` seconds ( `r round(elapsed/60,2)` minutes) using [knitr](https://cran.r-project.org/package=knitr) in [RStudio](http://www.rstudio.com) with `r R.version.string` running on `r R.version$platform`.
+
+A special mention must go to `twitteR` [@twitteR] for the twitter API interaction functions and `lubridate` [@lubridate] which allows time-zone manipulation without too many tears.
+
+Other R packages used:
+
+ * base R - for the basics [@baseR]
+ * data.table - for fast (big) data handling [@data.table]
+ * readr - for nice data loading [@readr]
+ * ggplot2 - for slick graphs [@ggplot2]
+ * plotly - fancy, zoomable slick graphs [@plotly]
+ * twitteR - twitter API search [@twitteR]
+ * knitr - to create this document [@knitr]
+
+# References
+
+
+

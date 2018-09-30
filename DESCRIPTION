@@ -12,3 +12,4 @@ Encoding: UTF-8
 LazyData: true
 URL: https://github.com/dataknut/hashTagR
 BugReports: https://github.com/dataknut/hashTagR/issues
+RoxygenNote: 6.1.0

@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Ben Anderson (@dataknut)" />
+
+
+<title>Twitter hashtag analysis: #birdoftheyear OR #boty</title>
+
+<script src="birdOfTheYear2018_files/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="birdOfTheYear2018_files/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="birdOfTheYear2018_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="birdOfTheYear2018_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="birdOfTheYear2018_files/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="birdOfTheYear2018_files/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="birdOfTheYear2018_files/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="birdOfTheYear2018_files/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="birdOfTheYear2018_files/navigation-1.1/tabsets.js"></script>
+<link href="birdOfTheYear2018_files/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="birdOfTheYear2018_files/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Twitter hashtag analysis: #birdoftheyear OR #boty</h1>
+<h4 class="author"><em>Ben Anderson (<code>@dataknut</code>)</em></h4>
+<h4 class="date"><em>Last run at: 2018-10-01 12:09:56</em></h4>
+
+</div>
+
+
+<div id="purpose" class="section level1">
+<h1><span class="header-section-number">1</span> Purpose</h1>
+<p>To extract and visualise tweets and re-tweets of #birdoftheyear OR #boty in September/October 2018.</p>
+<p>Borrowing extensively from <a href="https://github.com/mkearney/rtweet" class="uri">https://github.com/mkearney/rtweet</a></p>
+<p>We used the Twitter search API to extract ‘all’ tweets with the #birdoftheyear OR #boty hashtag in the ‘recent’ twitterVerse.</p>
+<p>It is therefore possible that not quite all tweets have been extracted although it seems likely that we have captured most <code>human</code> tweeting which was our main intention. Future work should instead use the Twitter <a href="https://dev.twitter.com/streaming/overview">streaming API</a>.</p>
+</div>
+<div id="load-data" class="section level1">
+<h1><span class="header-section-number">2</span> Load Data</h1>
+<p>Load the pre-collected data.</p>
+<pre><code>##  [1] &quot;user_id&quot;                 &quot;status_id&quot;              
+##  [3] &quot;created_at&quot;              &quot;screen_name&quot;            
+##  [5] &quot;text&quot;                    &quot;source&quot;                 
+##  [7] &quot;display_text_width&quot;      &quot;reply_to_status_id&quot;     
+##  [9] &quot;reply_to_user_id&quot;        &quot;reply_to_screen_name&quot;   
+## [11] &quot;is_quote&quot;                &quot;is_retweet&quot;             
+## [13] &quot;favorite_count&quot;          &quot;retweet_count&quot;          
+## [15] &quot;hashtags&quot;                &quot;symbols&quot;                
+## [17] &quot;urls_url&quot;                &quot;urls_t.co&quot;              
+## [19] &quot;urls_expanded_url&quot;       &quot;media_url&quot;              
+## [21] &quot;media_t.co&quot;              &quot;media_expanded_url&quot;     
+## [23] &quot;media_type&quot;              &quot;ext_media_url&quot;          
+## [25] &quot;ext_media_t.co&quot;          &quot;ext_media_expanded_url&quot; 
+## [27] &quot;ext_media_type&quot;          &quot;mentions_user_id&quot;       
+## [29] &quot;mentions_screen_name&quot;    &quot;lang&quot;                   
+## [31] &quot;quoted_status_id&quot;        &quot;quoted_text&quot;            
+## [33] &quot;quoted_created_at&quot;       &quot;quoted_source&quot;          
+## [35] &quot;quoted_favorite_count&quot;   &quot;quoted_retweet_count&quot;   
+## [37] &quot;quoted_user_id&quot;          &quot;quoted_screen_name&quot;     
+## [39] &quot;quoted_name&quot;             &quot;quoted_followers_count&quot; 
+## [41] &quot;quoted_friends_count&quot;    &quot;quoted_statuses_count&quot;  
+## [43] &quot;quoted_location&quot;         &quot;quoted_description&quot;     
+## [45] &quot;quoted_verified&quot;         &quot;retweet_status_id&quot;      
+## [47] &quot;retweet_text&quot;            &quot;retweet_created_at&quot;     
+## [49] &quot;retweet_source&quot;          &quot;retweet_favorite_count&quot; 
+## [51] &quot;retweet_retweet_count&quot;   &quot;retweet_user_id&quot;        
+## [53] &quot;retweet_screen_name&quot;     &quot;retweet_name&quot;           
+## [55] &quot;retweet_followers_count&quot; &quot;retweet_friends_count&quot;  
+## [57] &quot;retweet_statuses_count&quot;  &quot;retweet_location&quot;       
+## [59] &quot;retweet_description&quot;     &quot;retweet_verified&quot;       
+## [61] &quot;place_url&quot;               &quot;place_name&quot;             
+## [63] &quot;place_full_name&quot;         &quot;place_type&quot;             
+## [65] &quot;country&quot;                 &quot;country_code&quot;           
+## [67] &quot;geo_coords&quot;              &quot;coords_coords&quot;          
+## [69] &quot;bbox_coords&quot;             &quot;status_url&quot;             
+## [71] &quot;name&quot;                    &quot;location&quot;               
+## [73] &quot;description&quot;             &quot;url&quot;                    
+## [75] &quot;protected&quot;               &quot;followers_count&quot;        
+## [77] &quot;friends_count&quot;           &quot;listed_count&quot;           
+## [79] &quot;statuses_count&quot;          &quot;favourites_count&quot;       
+## [81] &quot;account_created_at&quot;      &quot;verified&quot;               
+## [83] &quot;profile_url&quot;             &quot;profile_expanded_url&quot;   
+## [85] &quot;account_lang&quot;            &quot;profile_banner_url&quot;     
+## [87] &quot;profile_background_url&quot;  &quot;profile_image_url&quot;      
+## [89] &quot;ba_obsDate&quot;              &quot;ba_obsTime&quot;</code></pre>
+<p>The table has 5,045 tweets (including 308 quotes and 3,690 re-tweets) from 1,802 tweeters between 2018-09-18 and 2018-09-30.</p>
+</div>
+<div id="analysis" class="section level1">
+<h1><span class="header-section-number">3</span> Analysis</h1>
+<div id="tweets-and-tweeters-over-time" class="section level2">
+<h2><span class="header-section-number">3.1</span> Tweets and Tweeters over time</h2>
+<div class="figure">
+<img src="birdOfTheYear2018_files/figure-html/allDaysChart-1.png" alt="All (re)tweets and quotes containing #birdoftheyear OR #boty2018-09-18 to 2018-09-30" />
+<p class="caption">All (re)tweets and quotes containing #birdoftheyear OR #boty2018-09-18 to 2018-09-30</p>
+</div>
+</div>
+<div id="screen-name" class="section level2">
+<h2><span class="header-section-number">3.2</span> Screen name</h2>
+<p>Next we’ll try by screen name.</p>
+<p>Here’s a really bad visualisation of all tweeters tweeting over time. Each row of pixels is a tweeter (the names are probably illegible) and a green dot indicates a few tweets in the half hour while a red dot indicates a lot of tweets.</p>
+<div class="figure">
+<img src="birdOfTheYear2018_files/figure-html/screenNameAll-1.png" alt="N tweets per day minutes by screen name" />
+<p class="caption">N tweets per day minutes by screen name</p>
+</div>
+<p>Yeah, that worked well.</p>
+<p>So let’s re-do that for the top 50 tweeters so we can see their tweetStreaks…</p>
+<p>Top tweeters:</p>
+<table>
+<caption>Top 15 tweeters (all days)</caption>
+<thead>
+<tr class="header">
+<th align="left">screen_name</th>
+<th align="right">nTweets</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">birdoftheyear</td>
+<td align="right">193</td>
+</tr>
+<tr class="even">
+<td align="left">coolbiRdpics</td>
+<td align="right">80</td>
+</tr>
+<tr class="odd">
+<td align="left">jackcraw57</td>
+<td align="right">63</td>
+</tr>
+<tr class="even">
+<td align="left">testeeves</td>
+<td align="right">62</td>
+</tr>
+<tr class="odd">
+<td align="left">Forest_and_Bird</td>
+<td align="right">61</td>
+</tr>
+<tr class="even">
+<td align="left">NatForsdick</td>
+<td align="right">60</td>
+</tr>
+<tr class="odd">
+<td align="left">mifflangstone</td>
+<td align="right">60</td>
+</tr>
+<tr class="even">
+<td align="left">vote4kaki</td>
+<td align="right">55</td>
+</tr>
+<tr class="odd">
+<td align="left">thebushline</td>
+<td align="right">50</td>
+</tr>
+<tr class="even">
+<td align="left">newzealandbirds</td>
+<td align="right">42</td>
+</tr>
+<tr class="odd">
+<td align="left">kiwilullaby</td>
+<td align="right">42</td>
+</tr>
+<tr class="even">
+<td align="left">votebittern</td>
+<td align="right">33</td>
+</tr>
+<tr class="odd">
+<td align="left">Em_Rawson</td>
+<td align="right">33</td>
+</tr>
+<tr class="even">
+<td align="left">votegannet</td>
+<td align="right">32</td>
+</tr>
+<tr class="odd">
+<td align="left">This_NZ_Life</td>
+<td align="right">28</td>
+</tr>
+</tbody>
+</table>
+<p>And their tweetStreaks…</p>
+<div class="figure">
+<img src="birdOfTheYear2018_files/figure-html/screenNameTop50-1.png" alt="N tweets per day minutes by screen name (top 50, reverse alphabetical)" />
+<p class="caption">N tweets per day minutes by screen name (top 50, reverse alphabetical)</p>
+</div>
+<p>Any twitterBots…?</p>
+</div>
+</div>
+<div id="about" class="section level1">
+<h1><span class="header-section-number">4</span> About</h1>
+<p>Analysis completed in 23.319 seconds ( 0.39 minutes) using <a href="https://cran.r-project.org/package=knitr">knitr</a> in <a href="http://www.rstudio.com">RStudio</a> with R version 3.5.1 (2018-07-02) running on x86_64-apple-darwin15.6.0.</p>
+<p>A special mention must go to <code>twitteR</code> <span class="citation">(Gentry, n.d.)</span> for the twitter API interaction functions and <code>lubridate</code> <span class="citation">(Grolemund and Wickham 2011)</span> which allows time-zone manipulation without too many tears.</p>
+<p>Other R packages used:</p>
+<ul>
+<li>base R - for the basics <span class="citation">(R Core Team 2016)</span></li>
+<li>data.table - for fast (big) data handling <span class="citation">(Dowle et al. 2015)</span></li>
+<li>readr - for nice data loading <span class="citation">(Wickham, Hester, and Francois 2016)</span></li>
+<li>ggplot2 - for slick graphs <span class="citation">(Wickham 2009)</span></li>
+<li>plotly - fancy, zoomable slick graphs <span class="citation">(Sievert et al. 2016)</span></li>
+<li>twitteR - twitter API search <span class="citation">(Gentry, n.d.)</span></li>
+<li>knitr - to create this document <span class="citation">(Xie 2016)</span></li>
+</ul>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1>References</h1>
+<div id="refs" class="references">
+<div id="ref-data.table">
+<p>Dowle, M, A Srinivasan, T Short, S Lianoglou with contributions from R Saporta, and E Antonyan. 2015. <em>Data.table: Extension of Data.frame</em>. <a href="https://CRAN.R-project.org/package=data.table" class="uri">https://CRAN.R-project.org/package=data.table</a>.</p>
+</div>
+<div id="ref-twitteR">
+<p>Gentry, Jeff. n.d. <em>TwitteR: R Based Twitter Client</em>. <a href="http://lists.hexdump.org/listinfo.cgi/twitter-users-hexdump.org" class="uri">http://lists.hexdump.org/listinfo.cgi/twitter-users-hexdump.org</a>.</p>
+</div>
+<div id="ref-lubridate">
+<p>Grolemund, Garrett, and Hadley Wickham. 2011. “Dates and Times Made Easy with lubridate.” <em>Journal of Statistical Software</em> 40 (3): 1–25. <a href="http://www.jstatsoft.org/v40/i03/" class="uri">http://www.jstatsoft.org/v40/i03/</a>.</p>
+</div>
+<div id="ref-baseR">
+<p>R Core Team. 2016. <em>R: A Language and Environment for Statistical Computing</em>. Vienna, Austria: R Foundation for Statistical Computing. <a href="https://www.R-project.org/" class="uri">https://www.R-project.org/</a>.</p>
+</div>
+<div id="ref-plotly">
+<p>Sievert, Carson, Chris Parmer, Toby Hocking, Scott Chamberlain, Karthik Ram, Marianne Corvellec, and Pedro Despouy. 2016. <em>Plotly: Create Interactive Web Graphics via ’Plotly.js’</em>. <a href="https://CRAN.R-project.org/package=plotly" class="uri">https://CRAN.R-project.org/package=plotly</a>.</p>
+</div>
+<div id="ref-ggplot2">
+<p>Wickham, Hadley. 2009. <em>Ggplot2: Elegant Graphics for Data Analysis</em>. Springer-Verlag New York. <a href="http://ggplot2.org" class="uri">http://ggplot2.org</a>.</p>
+</div>
+<div id="ref-readr">
+<p>Wickham, Hadley, Jim Hester, and Romain Francois. 2016. <em>Readr: Read Tabular Data</em>. <a href="https://CRAN.R-project.org/package=readr" class="uri">https://CRAN.R-project.org/package=readr</a>.</p>
+</div>
+<div id="ref-knitr">
+<p>Xie, Yihui. 2016. <em>Knitr: A General-Purpose Package for Dynamic Report Generation in R</em>. <a href="https://CRAN.R-project.org/package=knitr" class="uri">https://CRAN.R-project.org/package=knitr</a>.</p>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
