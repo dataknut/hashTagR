@@ -55,7 +55,7 @@ To extract and visualise tweets and re-tweets of `r params$hashtag` in September
 
 Borrowing extensively from https://github.com/mkearney/rtweet
 
-Th anaysis used `rtweet` to ask the Twitter search API to extract 'all' tweets with the `r params$hashtag` hashtag in the '[recent](https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets)' twitterVerse. 
+Th anaysis used `rtweet` to ask the Twitter search API to extract 'all' tweets containing the _`r params$hashtag`_ hashtags in the '[recent](https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets)' twitterVerse. 
 
 It is therefore possible that not quite all tweets have been extracted although it seems likely that we have captured most recent `human` tweeting which was the main intention. Future work should instead use the Twitter [streaming API](https://dev.twitter.com/streaming/overview).
 
@@ -109,7 +109,7 @@ plotDT <- twDT[, .(
     geom_line(aes(y = nTweets, colour = "N tweets")) +
     geom_line(aes(y = nTweeters, colour = "N tweeters")) +
     facet_grid(ba_tweetType ~ .) +
-    scale_x_date(date_breaks = "1 day") +
+    scale_x_date(date_breaks = "1 day", date_labels = "%a %d %b %Y") +
     theme(strip.text.y = element_text(size = 9, colour = "black", angle = 90)) +
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.5)) +
     theme(legend.position = "bottom") +
@@ -124,7 +124,7 @@ myPlot
 #ggplotly(myPlot)
 ```
 
-Figure \@ref(fig:allDaysChart) shows the number of tweets and tweeters in the data extract by day. The quotes, tweets and re-tweets have been separated.
+Figure \@ref(fig:allDaysChart) shows the number of tweets and tweeters in the data extract by day. The quotes, tweets and re-tweets have been separated. Looks to me like there's quite a lot of activity at weekends...
 
 If you are in New Zealand and you are wondering why there are no tweets `today` (`r lubridate::today()`) the answer is that twitter data (and these plots) are working in UTC and (y)our `today` hasn't started yet in UTC - but don't worry, all the tweets are here. It's just our old friend the timezone... :-)
 
@@ -144,7 +144,7 @@ myPlot <- ggplot(plotDT, aes(x = ba_obsDate)) +
     theme(strip.text.y = element_text(size = 9, colour = "black", angle = 0)) +
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.5)) +
     #scale_x_reverse() + # fix reverse plotting of long
-    scale_x_date(date_breaks = "1 day") +
+    scale_x_date(date_breaks = "1 day", date_labels = "%a %d %b %Y") +
     scale_fill_gradient(low="green", high = "red") +
     theme(legend.position = "bottom") +
     theme(legend.title = element_blank()) +
@@ -195,7 +195,7 @@ myPlot <- ggplot(plotDT, aes(x = ba_obsDate)) +
     geom_tile(aes(y = screen_name, fill = nTweets)) +
     theme(strip.text.y = element_text(size = 9, colour = "black", angle = 0)) +
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.5)) +
-    scale_x_date(date_breaks = "1 day") +
+    scale_x_date(date_breaks = "1 day", date_labels = "%a %d %b %Y") +
     scale_fill_gradient(low="green", high = "red") +
     theme(legend.position = "bottom") +
     theme(legend.title = element_blank()) +
@@ -227,7 +227,7 @@ ggplot2::ggplot(plotDT, aes(x = ba_obsDate, y = hashtags, fill = nTweets)) +
   geom_tile() + 
   theme(strip.text.y = element_text(size = 9, colour = "black", angle = 0)) +
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.5)) +
-    scale_x_date(date_breaks = "1 day") +
+    scale_x_date(date_breaks = "1 day", date_labels = "%a %d %b %Y") +
     scale_fill_gradient(low="green", high = "red") +
     theme(legend.position = "bottom") +
     theme(legend.title = element_blank()) +
