@@ -56,10 +56,15 @@ loadTweets <- function(path, string){
 
                    )
     )
-    return(tbl)
-  } else {
-    message("Didn't any files matching ",
+    fb <-paste0("Found ", nrow(fListDT), " files matching ",
             string, " in ",
             path)
+    print(fb)
+    return(tbl)
+  } else {
+    fb <- paste0("Didn't find any files matching ",
+            string, " in ",
+            path)
+    print(fb)
   }
 }
