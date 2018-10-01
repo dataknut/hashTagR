@@ -56,7 +56,7 @@ dPath <- "~/Data/twitter/"
 
 ## Citation
 
- * Anderson, B (`r lubridate::year(today())`) Twitter hashtag analysis: `r params$hashtag`. Downlaoded from: https://dataknut.github.io/hashTagR/birdOfTheYear2018.html
+ * Anderson, B (`r lubridate::year(today())`) Twitter hashtag analysis: `r params$hashtag`. Downloaded from: https://dataknut.github.io/hashTagR/birdOfTheYear2018.html
 
 # Purpose
 
@@ -68,15 +68,27 @@ The analysis used `rtweet` to ask the Twitter search API to extract 'all' tweets
 
 It is therefore possible that not quite all tweets have been extracted although it seems likely that we have captured most recent `human` tweeting which was the main intention. Future work should instead use the Twitter [streaming API](https://dev.twitter.com/streaming/overview).
 
-# Load Data
-
-Load the data (pre-collected using https://github.com/dataknut/hashTagR/blob/master/dataProcessing/getBoTY.R).
-
 ```{r load Data}
 # load from pre-collected ----
+message("Load from pre-collected data and check for duplicates")
+# https://github.com/dataknut/hashTagR/blob/master/dataProcessing/getBoTY.R
+# for testing params$hashtag <- "#birdoftheyear OR #boty"
+raw_twDT <- data.table::as.data.table(hashTagR::loadTweets(dPath, params$hashtag)) # we like data.tables
 
-twDT <- data.table::as.data.table(hashTagR::loadTweets(dPath, params$hashtag)) # we like data.tables
+# this data.table will have duplicate entries because:
+# 1. we may have run the search mutiple times
+# 2. the search results are dynamic - they can change if a tweet is liked, re-tweeted etc as this data is updated
 
+# we don't want duplicates, we just want the most recent tweet record by time of creation and screen_names
+
+rn <- nrow(raw_twDT)
+twDT <- unique(raw_twDT, fromLast = TRUE, by = c("created_at", "screen_name") ) # drop duplicates
+un <- nrow(twDT)
+message("Returning ", hashTagR::tidyNum(un),
+        " tweets after dropping ",
+        hashTagR::tidyNum(rn - un),
+        " duplicates.")
+    
 twDT <- twDT[, ba_obsDate := lubridate::date(created_at)]
 twDT <- twDT[, ba_obsTime := hms::as.hms(created_at)] # this will auto-convert to local time
 
