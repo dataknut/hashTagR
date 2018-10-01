@@ -8,5 +8,5 @@ Examples:
  Older examples (broken code) using tweetR:
  
   * [BBC Blue Planet](https://dataknut.github.io/tweetR/tweetRBluePlanet2_2017.html) 
-  * [DockerCon17 (Euupe)](dataknut.github.io/tweetR/tweetDockerConEU_2017.html)
+  * [DockerCon17 (Europe)](dataknut.github.io/tweetR/tweetDockerConEU_2017.html)
   * [DockerCon17](https://dataknut.github.io/tweetR/tweetDockerCon.html)
