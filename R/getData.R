@@ -52,7 +52,7 @@ loadTweets <- function(path, string){
                    lapply(fListDT$fullPath,
                           function(f)
                             readr::read_csv(path.expand(f),
-                                            progress = FALSE) # just in case, could switch off col_types() too
+                                            progress = FALSE) # switch off progress
 
                    )
     )

@@ -5,7 +5,7 @@ library(data.table)
 library(hashTagR)
 
 string <- "#birdoftheyear OR #boty" # see ?search_tweets - capitals are ignored (I think)
-ofile <- paste0("~/Data/twitter/tw_", string,"_", lubridate::today(),".csv")
+ofile <- paste0("~/Data/twitter/tw_", string,"_", lubridate::now(),".csv")
 
 botyDT <- hashTagR::saveTweets(string, ofile)
 
