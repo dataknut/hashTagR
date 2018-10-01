@@ -21,11 +21,15 @@ if(refresh){
   source(paste0(projLoc, "/dataProcessing/getBoTY.R"))
 }
 
-# --- Overview report ----
+# --- set params ----
+ofile <- "/docs/birdOfTheYear2018.html"
 hashtag <- '#birdoftheyear OR #boty' # <- for a different string just edit this & re-run
+explHashTag <- 'https://twitter.com/hashtag/birdoftheyear' # <- explanatory link for the hashtag
+pubUrl <- paste0("https://dataknut.github.io/hashTagR/", ofile) # <- where the results are published
+
 rmdFile <- paste0(projLoc, "/analysis/birdOfTheYear2018.Rmd")
 rmarkdown::render(input = rmdFile,
                   output_format = "html_document2",
-                  params = list(hashtag = hashtag),
-                  output_file = paste0(projLoc,"/docs/birdOfTheYear2018.html")
+                  params = list(hashtag = hashtag, explHashTag = explHashTag, pubUrl = pubUrl),
+                  output_file = paste0(projLoc,ofile)
 )

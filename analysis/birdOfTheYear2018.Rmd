@@ -1,6 +1,8 @@
 ---
 params:
-  hashtag: ''
+  hashtag : '' # the hashtag string we searched for
+  explHashTag: '' # <- explanatory link for the hashtag
+  pubUrl: '' # <- where the results are published
 title: 'Twitter hashtag analysis: `r params$hashtag`'
 author: "Ben Anderson (`@dataknut`)"
 date: 'Last run at: `r Sys.time()`'
@@ -56,11 +58,11 @@ dPath <- "~/Data/twitter/"
 
 ## Citation
 
- * Anderson, B (`r lubridate::year(today())`) Twitter hashtag analysis: `r params$hashtag`. Downloaded from: https://dataknut.github.io/hashTagR/birdOfTheYear2018.html
+ * Anderson, B (`r lubridate::year(today())`) _Twitter hashtag analysis: `r params$hashtag`_. Downloaded from: `r params$pubUrl`.
 
 # Purpose
 
-To extract and visualise tweets and re-tweets of `r params$hashtag` in September/October 2018.
+To extract and visualise tweets and re-tweets of _`r params$hashtag`_ (see `r params$explHashTag`).
 
 Borrowing extensively from https://github.com/mkearney/rtweet
 
