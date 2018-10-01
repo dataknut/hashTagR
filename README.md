@@ -5,7 +5,7 @@ Examples:
 
  * NZ #BirdOfTheYear
  
- Older examples (broken code):
+ Older examples (broken code) using tweetR:
  
   * [BBC Blue Planet](https://dataknut.github.io/tweetR/tweetRBluePlanet2_2017.html) 
   * [DockerCon17 (Euupe)](dataknut.github.io/tweetR/tweetDockerConEU_2017.html)
