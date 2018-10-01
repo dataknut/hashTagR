@@ -56,17 +56,7 @@ loadTweets <- function(path, string){
 
                    )
     )
-    message("Found ", nrow(fListDT),
-            " file(s) matching -> ",
-            string, " <- in ", path)
-    rn <- nrow(tbl)
-    utbl <- unique(tbl) # drop duplicates
-    un <- nrow(utbl)
-    message("Returning ", hashTagR::tidyNum(un),
-            " tweets after dropping ",
-            hashTagR::tidyNum(rn - un),
-            " duplicates.")
-    return(utbl)
+    return(tbl)
   } else {
     message("Didn't any files matching ",
             string, " in ",
