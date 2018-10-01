@@ -48,6 +48,15 @@ dPath <- "~/Data/twitter/"
 
 ```
 
+# Terms of re-use
+
+## License
+
+[CC-BY-SA](https://creativecommons.org/licenses/by-sa/4.0/) unless otherwise noted.
+
+## Citation
+
+ * Anderson, B (`r lubridate::year(today())`) Twitter hashtag analysis: `r params$hashtag`. Downlaoded from: https://dataknut.github.io/hashTagR/birdOfTheYear2018.html
 
 # Purpose
 
@@ -55,7 +64,7 @@ To extract and visualise tweets and re-tweets of `r params$hashtag` in September
 
 Borrowing extensively from https://github.com/mkearney/rtweet
 
-Th anaysis used `rtweet` to ask the Twitter search API to extract 'all' tweets containing the _`r params$hashtag`_ hashtags in the '[recent](https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets)' twitterVerse. 
+The analysis used `rtweet` to ask the Twitter search API to extract 'all' tweets containing the _`r params$hashtag`_ hashtags in the '[recent](https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets)' twitterVerse. 
 
 It is therefore possible that not quite all tweets have been extracted although it seems likely that we have captured most recent `human` tweeting which was the main intention. Future work should instead use the Twitter [streaming API](https://dev.twitter.com/streaming/overview).
 
