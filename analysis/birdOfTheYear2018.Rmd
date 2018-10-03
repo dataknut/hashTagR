@@ -278,7 +278,7 @@ kableExtra::kable(caption = "Top 20 hashtags in tweets containing #birdoftheyear
 ```
 
 
-```{r plotHashtags, fig.height=8, fig.cap="Top 50 hashtag strings"}
+```{r plotHashtags, fig.height=8, fig.cap="Most mentioned #hashtags per day"}
 
 # remove any which are _only_ birdoftheyear
 testDT <- htLongDT[!(grepl("birdoftheyear",htClean,ignore.case = TRUE) | 
