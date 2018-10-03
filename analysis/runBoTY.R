@@ -14,7 +14,7 @@ hashTagR::loadLibraries(reqLibs)
 # default code location - needed to load functions & parameters correctly so
 projLoc <- hashTagR::findParentDirectory("hashTagR")
 
-refresh <- 0 # 0 to skip data refresh
+refresh <- 1 # 0 to skip data refresh
 
 if(refresh){
   # grab the recent data & add to what we've saved before
