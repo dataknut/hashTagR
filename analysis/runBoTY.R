@@ -5,7 +5,7 @@
 library(hashTagR)
 
 # libs required by this code (.Rmd will call others needed there)
-reqLibs <- c("rmarkdown", "bookdown")
+reqLibs <- c("rmarkdown", "bookdown", "rtweet")
 
 print(paste0("Loading the following libraries: ", reqLibs))
 # Use Luke's function to require/install/load
