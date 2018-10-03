@@ -302,13 +302,7 @@ ggplot2::ggplot(tab[count > 5], aes(x = ba_obsDate, y = htClean, fill = count)) 
   
 ```
 
-Table \@ref(tab:hashTagTable) shows a _slightly_ more intelligible table of the same data summarised across all days to date. Note that this is not a true count of the mentions of a particular #hashtag - we would need to seperate the hashtags and then count unique hashtags for that. Work in progress...
 
-```{r hashTagTable}
-htCount <- htDT[!is.na(hashtags), .(nTweets = sum(nTweets)), keyby = .(hashtags)]
-kableExtra::kable(caption = "Number of tweets per hashtag string (sorted by nTweets)", htCount[order(-nTweets)]) %>%
-  kable_styling()
-```
 
 # About
 
