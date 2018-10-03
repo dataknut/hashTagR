@@ -3,7 +3,9 @@ Does what it says on the tin: Extracts and visualises twitter hashtags using htt
 
 Examples:
 
- * NZ #BirdOfTheYear
+All at https://dataknut.github.io/hashTagR/
+
+ * NZ [#BirdOfTheYear](https://dataknut.github.io/hashTagR/birdOfTheYear2018.html)
  
  Older examples (broken code) using tweetR:
  
