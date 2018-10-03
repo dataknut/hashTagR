@@ -160,7 +160,7 @@ If you are in New Zealand and you are wondering why there are no tweets `today` 
 
 Next we'll try by screen name.
 
-```{r screenNameAll, fig.height=8,fig.cap="N tweets per day by screen name"}
+```{r screenNamesTile, fig.height=8,fig.cap="N tweets per day by screen name"}
 
 plotDT <- twDT[, 
                     .(
@@ -183,7 +183,7 @@ myPlot <- ggplot(plotDT, aes(x = ba_obsDate)) +
 
 ```
 
-Figure \@ref(fig:screenNameAll) is a really bad visualisation of all tweeters tweeting over time. Each row of pixels is a tweeter (the names are probably illegible) and a green dot indicates a few tweets in the given day while a red dot indicates a lot of tweets.
+Figure \@ref(fig:screenNamesTile) is a really bad visualisation of all tweeters tweeting over time. Each row of pixels is a tweeter (the names are probably illegible) and a green dot indicates a few tweets in the given day while a red dot indicates a lot of tweets.
 
 So let's re-do that for the top 50 tweeters so we can see their tweetStreaks (tm)...
 
