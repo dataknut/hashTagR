@@ -38,7 +38,13 @@ startTime <- proc.time()
 # Libraries ----
 
 # additional libs required by this code
-reqLibs <- c("ggplot2", "data.table", "knitr", "readr", "plotly", "kableExtra")
+reqLibs <- c("data.table",
+             "ggplot2",  
+             "readr", 
+             "reshape2",
+             "knitr", 
+             "kableExtra"
+             )
 
 print(paste0("Loading the following libraries: ", reqLibs))
 # Use Luke's function to require/install/load
@@ -144,7 +150,6 @@ plotDT <- twDT[, .(
 
 myPlot
 
-#ggplotly(myPlot)
 ```
 
 Figure \@ref(fig:allDaysChart) shows the number of tweets and tweeters in the data extract by day. The quotes, tweets and re-tweets have been separated. Looks to me like there's quite a lot of activity at weekends...
@@ -176,10 +181,9 @@ myPlot <- ggplot(plotDT, aes(x = ba_obsDate)) +
          y = "Screen name"
     )
 
-plotly::ggplotly(myPlot)
 ```
 
-Figure \@ref(fig:screenNameAll) is a really bad visualisation of all tweeters tweeting over time. Each row of pixels is a tweeter (the names are probably illegible) and a green dot indicates a few tweets in the given day while a red dot indicates a lot of tweets. We've used `plotly::ggplotly()` so you can hover over the data points but it's still pretty messy.
+Figure \@ref(fig:screenNameAll) is a really bad visualisation of all tweeters tweeting over time. Each row of pixels is a tweeter (the names are probably illegible) and a green dot indicates a few tweets in the given day while a red dot indicates a lot of tweets.
 
 So let's re-do that for the top 50 tweeters so we can see their tweetStreaks (tm)...
 
@@ -227,8 +231,6 @@ myPlot <- ggplot(plotDT, aes(x = ba_obsDate)) +
          y = "Screen name"
     )
 
-#ggplotly(myPlot)
-
 myPlot 
 ```
 
@@ -236,17 +238,56 @@ Any twitterBots...?
 
 ## Which birds are mentioned the most (by hashtag)
 
-This is very quick and dirty but... Figure \@ref(fig:plotHashtags) plots the number of tweets for each concatenated hashtag string (non-separated hashtags) after removing tweets which have variants of `#birdOfTheYear` and `#boty` as the _only_ hashtags and selecting the top 50. Tweets mentioning birds without using a `#<birdName>` hashtag will not show up; birds #mentioned in tweets with a lot of varying other #hashtags will be under-represented etc etc. This is a _really_ imperfect measure of just about anything so #YMMV.
+
+```{r processHTs}
+htDT <- twDT[!is.na(hashtags), .(hashtags, ba_obsDate)] # remove any tweets without hashtags. How can there be no hashtags when we searched on hashtags?
+
+# now string split them
+# https://stackoverflow.com/questions/33200179/dynamically-assign-number-of-splits-in-data-table-tstrsplit
+splits <- max(lengths(strsplit(htDT$hashtags, "|", , fixed=T)))
+htDT <- htDT[, paste0("ht", 1:splits) := tstrsplit(hashtags, "|", fixed=T)]
+# reshape the list
+htLongDT <- reshape2::melt(htDT, id=c("hashtags","ba_obsDate"))
+# remove NA
+htLongDT <- htLongDT[!is.na(value)]
+message("We have ", nrow(htLongDT), " hashtags.")
+message("That's about ~ ", round(nrow(htLongDT)/nrow(twDT),2), " hashtags per tweet...")
+# process in steps to be clear
+htLongDT <- htLongDT[, htOrig := value]
+# so that TeamKakī == TeamKaki & takahe == takahē etc https://twitter.com/Thoughtfulnz/status/1046685305569345536
+
+macron <- c("ā", "ē", "ī", "ō", "ū") # set macron vowels https://kupu.maori.nz/about/macrons-keyboard-setup
+roman <- c("a", "e", "i", "o", "u") # roman equiv
+
+# for some reason looping over the above fails... so:
+htLongDT <- htLongDT[, htOrigAnglo := gsub("ā","a", htOrig, fixed = TRUE)] 
+htLongDT <- htLongDT[, htOrigAnglo := gsub("ē","e", htOrig, fixed = TRUE)] 
+htLongDT <- htLongDT[, htOrigAnglo := gsub("ī","i", htOrig, fixed = TRUE)] 
+htLongDT <- htLongDT[, htOrigAnglo := gsub("ō","o", htOrig, fixed = TRUE)] 
+htLongDT <- htLongDT[, htOrigAnglo := gsub("ū","u", htOrig, fixed = TRUE)] 
+
+htLongDT <- htLongDT[, htClean := tolower(htOrigAnglo)] # lower case
+```
+
+This is very quick and dirty but... Table \@ref(tab:tweetTable) shows the total count of each #hashtag. Note that I have tried to [de-macron](https://kupu.maori.nz/about/macrons-keyboard-setup) the vowels so that kakī == kaki (for example) but it is currently not working.
+
+```{r tweetTable}
+kableExtra::kable(caption = "Top 20 hashtags in tweets containing #birdoftheyear or #boty",
+                  head(htLongDT[, .(count = .N), by = htClean][order(-count)],20)) %>%
+  kable_styling()
+```
+
+Figure \@ref(fig:plotHashtags) plots the daily occurence of these hashtags after removing variants of `#birdOfTheYear` and `#boty` and selecting only those which have more than 5 mentions on any day. Tweets mentioning birds without using a `#<birdName>` hashtag will not show up and we still have the kakī != kaki issue so this is a _really_ imperfect measure.  #YMMV.
 
 ```{r plotHashtags, fig.height=8, fig.cap="Top 50 hashtag strings"}
-htDT <- twDT[, .(nTweets = .N), keyby = .(hashtags, ba_obsDate)]
+
 # remove any which are _only_ birdoftheyear
-htDT <- htDT[!(grepl("birdoftheyear",hashtags,ignore.case = TRUE) | 
-                grepl("boty",hashtags,ignore.case = TRUE) )]
+testDT <- htLongDT[!(grepl("birdoftheyear",htClean,ignore.case = TRUE) | 
+                grepl("boty",htClean,ignore.case = TRUE) )]
 
-plotDT <- head(htDT[!is.na(hashtags)][order(-nTweets)], 50) # top 50
+tab <- testDT[, .(count = .N), keyby = .(ba_obsDate, htClean)]
 
-ggplot2::ggplot(plotDT, aes(x = ba_obsDate, y = hashtags, fill = nTweets)) +
+ggplot2::ggplot(tab[count > 5], aes(x = ba_obsDate, y = htClean, fill = count)) +
   geom_tile() + 
   theme(strip.text.y = element_text(size = 9, colour = "black", angle = 0)) +
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.5)) +
@@ -256,7 +297,7 @@ ggplot2::ggplot(plotDT, aes(x = ba_obsDate, y = hashtags, fill = nTweets)) +
     theme(legend.title = element_blank()) +
     labs(caption = paste0(dataCap,"\nReverse alphabetical order"),
          x = "Date",
-         y = "Concatenated unique hashtags"
+         y = "Unique hashtags"
     )
   
 ```
@@ -282,14 +323,13 @@ Analysis completed in `r elapsed` seconds ( `r round(elapsed/60,2)` minutes) usi
 A special mention must go to `https://github.com/mkearney/rtweet` [@rtweet-package] for the twitter API interaction functions.
 
 Other R packages used:
-
  * base R - for the basics [@baseR]
  * data.table - for fast (big) data handling [@data.table]
- * readr - for nice data loading [@readr]
  * ggplot2 - for slick graphs [@ggplot2]
- * plotly - fancy, zoomable slick graphs [@plotly]
+ * readr - for nice data loading [@readr]
+ * reshape2 - wide to long [@reshape2]
  * rtweet - twitter API search [@rtweet-package]
- * knitr & bookdown - to create this document [@knitr,@bookdown]
+ * knitr, bookdown & kableExtra - to create this document [@knitr,@bookdown, @kableExtra]
 
 # References
 
