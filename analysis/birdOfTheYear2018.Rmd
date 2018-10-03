@@ -167,7 +167,7 @@ plotDT <- twDT[,
                       nTweets = .N
                     ), by = .(screen_name, ba_obsDate)]
 
-myPlot <- ggplot(plotDT, aes(x = ba_obsDate)) +
+tilePlot <- ggplot(plotDT, aes(x = ba_obsDate)) +
     geom_tile(aes(y = screen_name, fill = nTweets)) +
     theme(strip.text.y = element_text(size = 9, colour = "black", angle = 0)) +
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.5)) +
@@ -180,7 +180,7 @@ myPlot <- ggplot(plotDT, aes(x = ba_obsDate)) +
          x = "Date",
          y = "Screen name"
     )
-
+tilePlot
 ```
 
 Figure \@ref(fig:screenNamesTile) is a really bad visualisation of all tweeters tweeting over time. Each row of pixels is a tweeter (the names are probably illegible) and a green dot indicates a few tweets in the given day while a red dot indicates a lot of tweets.
@@ -240,14 +240,14 @@ Any twitterBots...?
 
 
 ```{r processHTs}
-htDT <- twDT[!is.na(hashtags), .(hashtags, ba_obsDate)] # remove any tweets without hashtags. How can there be no hashtags when we searched on hashtags?
+htDT <- twDT[!is.na(hashtags), .(hashtags, ba_obsDate, ba_tweetType)] # remove any tweets without hashtags. How can there be no hashtags when we searched on hashtags?
 
 # now string split them
 # https://stackoverflow.com/questions/33200179/dynamically-assign-number-of-splits-in-data-table-tstrsplit
 splits <- max(lengths(strsplit(htDT$hashtags, "|", , fixed=T)))
 htDT <- htDT[, paste0("ht", 1:splits) := tstrsplit(hashtags, "|", fixed=T)]
 # reshape the list
-htLongDT <- reshape2::melt(htDT, id=c("hashtags","ba_obsDate"))
+htLongDT <- reshape2::melt(htDT, id=c("hashtags","ba_obsDate", "ba_tweetType"))
 # remove NA
 htLongDT <- htLongDT[!is.na(value)]
 message("We have ", nrow(htLongDT), " hashtags.")
@@ -273,10 +273,11 @@ This is very quick and dirty but... Table \@ref(tab:tweetTable) shows the total 
 
 ```{r tweetTable}
 kableExtra::kable(caption = "Top 20 hashtags in tweets containing #birdoftheyear or #boty",
-                  head(htLongDT[, .(count = .N), by = htClean][order(-count)],20)) %>%
+                  head(htLongDT[, .(count = .N), by = .(htClean, ba_tweetType)][order(-count)],20)) %>%
   kable_styling()
 ```
 
+Figure \@ref(fig:plotHashtags) plots the daily occurence of these hashtags after removing variants of `#birdOfTheYear` and `#boty` and selecting only those which have more than `r threshold` mentions on any day. Tweets mentioning birds without using a `#<birdName>` hashtag will not show up and we still have the kakī != kaki issue so this is a _really_ imperfect measure.  For clarity we have not separated tweets from re-tweets. #YMMV.
 
 ```{r plotHashtags, fig.height=8, fig.cap="Most mentioned #hashtags per day"}
 
@@ -284,26 +285,25 @@ kableExtra::kable(caption = "Top 20 hashtags in tweets containing #birdoftheyear
 testDT <- htLongDT[!(grepl("birdoftheyear",htClean,ignore.case = TRUE) | 
                 grepl("boty",htClean,ignore.case = TRUE) )]
 
-tab <- testDT[, .(count = .N), keyby = .(ba_obsDate, htClean)]
+tab <- testDT[, .(count = .N), keyby = .(ba_obsDate, htClean, ba_tweetType)]
 
 threshold <- 10
 
 ggplot2::ggplot(tab[count > threshold], aes(x = ba_obsDate, y = htClean, fill = count)) +
   geom_tile() + 
   theme(strip.text.y = element_text(size = 9, colour = "black", angle = 0)) +
-    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.5)) +
-    scale_x_date(date_breaks = "1 day", date_labels = "%a %d %b %Y") +
-    scale_fill_gradient(low="green", high = "red") +
-    theme(legend.position = "bottom") +
-    theme(legend.title = element_blank()) +
-    labs(caption = paste0(dataCap,"\nReverse alphabetical order"),
-         x = "Date",
-         y = "Unique hashtags"
-    )
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.5)) +
+  scale_x_date(date_breaks = "1 day", date_labels = "%a %d %b %Y") +
+  scale_fill_gradient(low="green", high = "red") +
+ # facet_grid(ba_tweetType ~ .) +
+  theme(legend.position = "bottom") +
+  theme(legend.title = element_blank()) +
+  labs(caption = paste0(dataCap,"\nReverse alphabetical order"),
+       x = "Date",
+       y = "Unique hashtags"
+  )
   
 ```
-
-Figure \@ref(fig:plotHashtags) plots the daily occurence of these hashtags after removing variants of `#birdOfTheYear` and `#boty` and selecting only those which have more than `r threshold` mentions on any day. Tweets mentioning birds without using a `#<birdName>` hashtag will not show up and we still have the kakī != kaki issue so this is a _really_ imperfect measure.  #YMMV.
 
 # About
 
@@ -318,6 +318,7 @@ Analysis completed in `r elapsed` seconds ( `r round(elapsed/60,2)` minutes) usi
 A special mention must go to `https://github.com/mkearney/rtweet` [@rtweet-package] for the twitter API interaction functions.
 
 Other R packages used:
+
  * base R - for the basics [@baseR]
  * data.table - for fast (big) data handling [@data.table]
  * ggplot2 - for slick graphs [@ggplot2]
