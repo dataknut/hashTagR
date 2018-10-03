@@ -68,7 +68,7 @@ dPath <- "~/Data/twitter/"
 
 # Purpose
 
-To extract and visualise tweets and re-tweets of _`r params$hashtag`_ (see `r params$explHashTag`).
+To extract and visualise tweets and re-tweets of _`r params$hashtag`_ (see `r params$explHashTag` and the [Forest & Bird voting site](https://www.birdoftheyear.org.nz/)).
 
 Borrowing extensively from https://github.com/mkearney/rtweet
 
