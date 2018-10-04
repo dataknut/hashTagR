@@ -2,7 +2,9 @@
 #'
 #' \code{saveTweets} takes a string and matches it to recent tweets
 #'
-#' Puts the results into a tbl and saves it to ofile. Returns the tbl for further fun.
+#' Puts the results into a data.table and saves it to ofile using data.table::fwrite (very fast).
+#'
+#' Returns the data.table for further fun.
 #'
 #' @param string the string to look for
 #' @param ofile file to save to
@@ -30,7 +32,8 @@ saveTweets <- function(string,ofile, n = 18000){
 #'
 #'   If no matches, returns nothing but gives feedback.
 #'
-#'   If there are matches, rbinds them all into a tbl, gives feedback and returns the tbl for further fun.
+#'   If there are matches, rbinds them all into a tbl, gives feedback and returns the tbl as a data.table
+#'   for further fun.
 #'
 #'   Note that list.files() is recursive by default. This can lead to large search times if you start it at
 #'   the top of a file structure. Use wisely.
@@ -64,7 +67,7 @@ loadTweets <- function(path, pattern, recursive = TRUE){
                 pattern, " in ",
             path)
     print(fb)
-    return(tbl)
+    return(data.table::as.data.table(tbl))
   } else {
     fb <- paste0("Didn't find any files matching ",
             string, " in ",
