@@ -67,6 +67,14 @@ dPath <- "~/Data/twitter/"
 
  * Anderson, B (`r lubridate::year(today())`) _Twitter hashtag analysis: `r params$hashtag`_. Downloaded from: `r params$pubUrl`.
 
+## Code
+
+See:
+
+ * Code: https://github.com/dataknut/hashTagR/blob/master/analysis/birdOfTheYear2018.Rmd
+ * Code/report [history](https://github.com/dataknut/hashTagR/commits/master/analysis/birdOfTheYear2018.Rmd)
+ * Raise an issue [here](https://github.com/dataknut/hashTagR/issues?q=is%3Aissue+label%3A%23boty)
+ 
 # Purpose
 
 I've not been in NZ at this time of year before so `r params$hashtag` is a whole new cultural experience.
@@ -245,6 +253,7 @@ Any twitterBots...?
 
 ## Which birds are mentioned the most (by hashtag)
 
+This is very quick and dirty but... to calculate this we have to do a bit of string processing first.
 
 ```{r processHTs}
 htDT <- twDT[!is.na(hashtags), .(hashtags, ba_obsDate, ba_tweetType)] # remove any tweets without hashtags. How can there be no hashtags when we searched on hashtags?
@@ -263,20 +272,26 @@ message("That's about ~ ", round(nrow(htLongDT)/nrow(twDT),2), " hashtags per tw
 htLongDT <- htLongDT[, htOrig := value]
 ```
 
-```{r tidyHashtags, echo=TRUE}
-# First we remove the macrons so that TeamKakī == TeamKaki & takahe == takahē etc 
-# h/t: https://twitter.com/Thoughtfulnz/status/1046685305569345536
+This is how I have tidied the hashtags (make other suggestions [here](https://github.com/dataknut/hashTagR/issues?q=is%3Aissue+label%3A%23boty)):
 
+```{r tidyHashtags, echo=TRUE}
+# First we make everything lower case
 htLongDT <- htLongDT[, htLower := tolower(htOrig)] # lower case
 
-# kakī != kaki
-
-
+# Next we remove the macrons so that TeamKakī == TeamKaki & takahe == takahē etc 
+# h/t: https://twitter.com/Thoughtfulnz/status/1046685305569345536
 htLongDT <- htLongDT[, htClean := stringr::str_replace_all(htLower,"[āēīōū]",hashTagR::deMacron)]
-htLongDT <- htLongDT[, htClean := gsub("team", "",htClean)] # remove 'team' from a string so that e.g. teamkaki == kaki
+
+# Now remove 'team' from a string so that e.g. teamkaki == kaki
+htLongDT <- htLongDT[, htClean := gsub("team", "",htClean)]
+
+# Now remove variants on 'vote'
+htLongDT <- htLongDT[, htClean := gsub("vote4", "",htClean)]
+htLongDT <- htLongDT[, htClean := gsub("vote", "",htClean)]
+
 ```
 
-This is very quick and dirty but... Table \@ref(tab:tweetTable) shows the total count of each #hashtag by (re)tweet type. With thanks to [David Hood](https://twitter.com/Thoughtfulnz/status/1046685305569345536) for code to help make sure that kakī == kaki ([etc](https://kupu.maori.nz/about/macrons-keyboard-setup)).
+Table \@ref(tab:tweetTable) shows the total count of each #hashtag by (re)tweet type. With thanks to [David Hood](https://twitter.com/Thoughtfulnz/status/1046685305569345536) for code to help make sure that kakī == kaki ([etc](https://kupu.maori.nz/about/macrons-keyboard-setup)).
 
 
 ```{r tweetTable}
