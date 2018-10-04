@@ -59,7 +59,7 @@ dPath <- "~/Data/twitter/"
 
 # TL;DR
 
-You'll be wanting Section \@ref(cumulative) for the trending hashtags...
+> You'll be wanting Section \@ref(cumulative) for the trending hashtags...
 
 # Terms of re-use
 
