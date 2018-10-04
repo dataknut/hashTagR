@@ -17,7 +17,9 @@ saveTweets(string, ofile, n = 18000)
 \code{saveTweets} takes a string and matches it to recent tweets
 }
 \details{
-Puts the results into a tbl and saves it to ofile. Returns the tbl for further fun.
+Puts the results into a data.table and saves it to ofile using data.table::fwrite (very fast).
+
+Returns the data.table for further fun.
 }
 \author{
 Ben Anderson, \email{b.anderson@soton.ac.uk}

@@ -19,7 +19,8 @@ loadTweets(path, pattern, recursive = TRUE)
 \details{
 If no matches, returns nothing but gives feedback.
 
-If there are matches, rbinds them all into a tbl, gives feedback and returns the tbl for further fun.
+If there are matches, rbinds them all into a tbl, gives feedback and returns the tbl as a data.table
+  for further fun.
 
 Note that list.files() is recursive by default. This can lead to large search times if you start it at
   the top of a file structure. Use wisely.

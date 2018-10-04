@@ -88,7 +88,7 @@ It is therefore possible that not quite all tweets have been extracted although 
 message("Load from pre-collected data and check for duplicates")
 # https://github.com/dataknut/hashTagR/blob/master/dataProcessing/getBoTY.R
 # for testing params$hashtag <- "#birdoftheyear OR #boty"
-raw_twDT <- data.table::as.data.table(hashTagR::loadTweets(dPath, params$hashtag)) # we like data.tables
+raw_twDT <- hashTagR::loadTweets(dPath, params$hashtag) # we like data.tables
 
 # this data.table will have duplicate entries because:
 # 1. we may have run the search mutiple times
@@ -364,7 +364,9 @@ ggplot2::ggplot(plotDT[count > 30], aes(x = htCleanOr, y = count, fill = htClean
 
 Loads of them. But primarily:
 
- * hashTags as indicators: tweets mentioning birds without using a `#<birdName>` hashtag (like [this rather popular one](https://twitter.com/BillBailey/status/1046965452063293447)) will not show up. [#YMMV](https://dictionary.cambridge.org/dictionary/english/ymmv);
+ * hashTags as indicators: 
+    * tweets mentioning birds without using a `#<birdName>` hashtag (like [this rather popular one](https://twitter.com/BillBailey/status/1046965452063293447)) will not show up. [#YMMV](https://dictionary.cambridge.org/dictionary/english/ymmv);
+    * there is no sentiment analysis so tweets saying "vote #takahe and the gannet gets it" look the same as "vote #takehe or the gannet gets it";
  * removing the macrons: the tables and plots display incorrect Māori names. Unfortunately I have not found a way to put them back in the right words (and only the right words).
 
 # About
