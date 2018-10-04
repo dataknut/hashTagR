@@ -311,7 +311,7 @@ ggplot2::ggplot(htTabDT[count > threshold], aes(x = ba_obsDate, y = htClean, fil
 
 No idea. 
 
-There are _a lot_ of problems with this approach (see Section \@ref(problems)) but if the hashtags have any predictive value at all then Figure \@ref(fig:cumulativeHtCounts) should be an indicator of the direction of travel (watch for lines of apparently dis-similar hashtags where the macron fix has failed) and \@ref(fig:htCountsTodate) shows the totals to date.
+There are _a lot_ of problems with this approach (see Section \@ref(problems)) but if the hashtags have any predictive value at all then Figure \@ref(fig:cumulativeHtCounts) should be an indicator of the direction of travel (watch for lines of apparently dis-similar hashtags where the macron fix has failed) and Figure \@ref(fig:htCountsTodate) shows the totals to date.
 
 Figure \@ref(fig:cumulativeHtCounts) uses `plotly` to avoid having to render a large legend - just hover over the lines to see who is who...
 
@@ -356,7 +356,7 @@ ggplot2::ggplot(plotDT[count > 30], aes(x = htCleanOr, y = count, fill = htClean
 
 Loads of them. But primarily:
 
- * #hashTags as indicators: tweets mentioning birds without using a `#<birdName>` hashtag (like [this rather popular one](https://twitter.com/BillBailey/status/1046965452063293447)) will not show up. [#YMMV](https://dictionary.cambridge.org/dictionary/english/ymmv);
+ * hashTags as indicators: tweets mentioning birds without using a `#<birdName>` hashtag (like [this rather popular one](https://twitter.com/BillBailey/status/1046965452063293447)) will not show up. [#YMMV](https://dictionary.cambridge.org/dictionary/english/ymmv);
  * removing the macrons: the tables and plots display incorrect Māori names. Unfortunately I have not found a way to put them back in the right words (and only the right words).
 
 # About
