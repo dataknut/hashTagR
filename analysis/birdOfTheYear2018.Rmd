@@ -364,7 +364,9 @@ ggplot2::ggplot(plotDT[count > 30], aes(x = htCleanOr, y = count, fill = htClean
 
 Loads of them. But primarily:
 
- * hashTags as indicators: tweets mentioning birds without using a `#<birdName>` hashtag (like [this rather popular one](https://twitter.com/BillBailey/status/1046965452063293447)) will not show up. [#YMMV](https://dictionary.cambridge.org/dictionary/english/ymmv);
+ * hashTags as indicators: 
+    * tweets mentioning birds without using a `#<birdName>` hashtag (like [this rather popular one](https://twitter.com/BillBailey/status/1046965452063293447)) will not show up. [#YMMV](https://dictionary.cambridge.org/dictionary/english/ymmv);
+    * there is no sentiment analysis so tweets saying "vote #takahe and the gannet gets it" look the same as "vote #takehe or the gannet gets it";
  * removing the macrons: the tables and plots display incorrect Māori names. Unfortunately I have not found a way to put them back in the right words (and only the right words).
 
 # About
