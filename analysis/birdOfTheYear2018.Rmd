@@ -5,7 +5,7 @@ params:
   pubUrl: '' # <- where the results are published
 title: 'Twitter hashtag analysis: `r params$hashtag`'
 author: "Ben Anderson (`@dataknut`)"
-date: 'Last run at: `r Sys.time()`'
+date: 'Last run at: `r lubridate::now()`'
 output:
   bookdown::html_document2:
     keep_md: yes
