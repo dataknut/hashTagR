@@ -44,3 +44,5 @@ rmarkdown::render(input = rmdFile,
 cmsg <- paste0("Latest #birdOfTheYear data refresh & replot: ", lubridate::now())
 gc <- paste0("git commit -m ", cmsg)
 #try(system(gc))
+# git pull
+# git push origin refs/heads/master
