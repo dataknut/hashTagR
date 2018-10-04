@@ -42,6 +42,7 @@ reqLibs <- c("data.table",
              "ggplot2",  
              "readr", 
              "reshape2",
+             "stringr",
              "knitr", 
              "kableExtra"
              )
@@ -154,7 +155,7 @@ myPlot
 
 Figure \@ref(fig:allDaysChart) shows the number of tweets and tweeters in the data extract by day. The quotes, tweets and re-tweets have been separated. Looks to me like there's quite a lot of activity at weekends...
 
-If you are in New Zealand and you are wondering why there are no tweets `today` (`r lubridate::today()`) the answer is that twitter data (and these plots) are working in UTC and (y)our `today` hasn't started yet in UTC - but don't worry, all the tweets are here. It's just our old friend the timezone... :-)
+If you are in New Zealand and you are wondering why there are no tweets `today` (`r lubridate::today()`) the answer is that twitter data (and these plots) are working in UTC and (y)our `today()` may not have started yet in UTC. Don't worry, all the tweets are here - it's just our old friend the timezone... :-)
 
 ## Who's tweeting?
 
@@ -274,13 +275,11 @@ This is very quick and dirty but... Table \@ref(tab:tweetTable) shows the total 
 
 ```{r tweetTable}
 kableExtra::kable(caption = "Top 20 hashtags in tweets containing #birdoftheyear or #boty",
-                  head(htLongDT[, .(count = .N), by = .(htClean, ba_tweetType)][order(-count)],20)) %>%
+                  head(htLongDT[, .(count = .N), by = .(hashTag = htClean, type = ba_tweetType)][order(-count)],20)) %>%
   kable_styling()
 ```
 
-Figure \@ref(fig:plotHashtags) plots the daily occurence of these hashtags after removing variants of `#birdOfTheYear` and `#boty` and selecting only those which have more than `r threshold` mentions on any day. For clarity we have not separated tweets from re-tweets. See Section \@ref(problems) for the problems with this approach.
-
-#YMMV.
+Figure \@ref(fig:plotHashtags) plots the daily occurence of these hashtags after removing variants of `#birdOfTheYear` and `#boty` and selecting only those which have more than `r threshold` mentions on any day. For clarity tweets and re-tweets are aggregated. See Section \@ref(problems) for the problems with this #hashTag counting approach.
 
 ```{r plotHashtags, fig.height=8, fig.cap="Most mentioned #hashtags per day"}
 
@@ -353,15 +352,12 @@ ggplot2::ggplot(plotDT[count > 30], aes(x = htCleanOr, y = count, fill = htClean
   )
 ```
 
-# Problems with counting #hashtags {#problems}
+# Problems {#problems}
 
 Loads of them. But primarily:
 
- * tweets mentioning birds without using a `#<birdName>` hashtag (like [this rather popular one](https://twitter.com/BillBailey/status/1046965452063293447)) will not show up.
- 
-> => this is a _really_ imperfect measure.  
-
-[#YMMV](https://dictionary.cambridge.org/dictionary/english/ymmv)
+ * #hashTags as indicators: tweets mentioning birds without using a `#<birdName>` hashtag (like [this rather popular one](https://twitter.com/BillBailey/status/1046965452063293447)) will not show up. [#YMMV](https://dictionary.cambridge.org/dictionary/english/ymmv);
+ * removing the macrons: the tables and plots display incorrect Māori names. Unfortunately I have not found a way to put them back in the right words (and only the right words).
 
 # About
 
@@ -383,6 +379,7 @@ Other R packages used:
  * readr - for nice data loading [@readr]
  * reshape2 - wide to long [@reshape2]
  * rtweet - twitter API search [@rtweet-package]
+ * stringr - processing strings [@stringr]
  * knitr, bookdown & kableExtra - to create this document [@knitr,@bookdown, @kableExtra]
 
 # References
