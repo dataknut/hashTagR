@@ -269,7 +269,8 @@ deMacron <- function(original){
 htLongDT <- htLongDT[,htClean := stringr::str_replace_all(htLower,"[āēīōū]",deMacron)]
 ```
 
-This is very quick and dirty but... Table \@ref(tab:tweetTable) shows the total count of each #hashtag with thanks to [David Hood](https://twitter.com/Thoughtfulnz/status/1046685305569345536) for code to help make sure that kakī == kaki.
+This is very quick and dirty but... Table \@ref(tab:tweetTable) shows the total count of each #hashtag by (re)tweet type. With thanks to [David Hood](https://twitter.com/Thoughtfulnz/status/1046685305569345536) for code to help make sure that kakī == kaki.
+
 
 ```{r tweetTable}
 kableExtra::kable(caption = "Top 20 hashtags in tweets containing #birdoftheyear or #boty",
@@ -277,9 +278,9 @@ kableExtra::kable(caption = "Top 20 hashtags in tweets containing #birdoftheyear
   kable_styling()
 ```
 
-Figure \@ref(fig:plotHashtags) plots the daily occurence of these hashtags after removing variants of `#birdOfTheYear` and `#boty` and selecting only those which have more than `r threshold` mentions on any day. See Section \@ref(problems) for the problems with this approach.
+Figure \@ref(fig:plotHashtags) plots the daily occurence of these hashtags after removing variants of `#birdOfTheYear` and `#boty` and selecting only those which have more than `r threshold` mentions on any day. For clarity we have not separated tweets from re-tweets. See Section \@ref(problems) for the problems with this approach.
 
-For clarity we have not separated tweets from re-tweets. #YMMV.
+#YMMV.
 
 ```{r plotHashtags, fig.height=8, fig.cap="Most mentioned #hashtags per day"}
 
