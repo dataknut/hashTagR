@@ -69,9 +69,15 @@ dPath <- "~/Data/twitter/"
 
 # Purpose
 
-To extract and visualise tweets and re-tweets of _`r params$hashtag`_ (see `r params$explHashTag` and the [Forest & Bird voting site](https://www.birdoftheyear.org.nz/)).
+I've not been in NZ at this time of year before so `r params$hashtag` is a whole new cultural experience.
 
-Borrowing extensively from https://github.com/mkearney/rtweet
+The idea is to extract and visualise tweets and re-tweets of _`r params$hashtag`_ (see `r params$explHashTag` and the [Forest & Bird voting site](https://www.birdoftheyear.org.nz/)).
+
+Why? Err.... Just. Because.
+
+# How it works
+
+Code borrows extensively from https://github.com/mkearney/rtweet
 
 The analysis used `rtweet` to ask the Twitter search API to extract 'all' tweets containing the _`r params$hashtag`_ hashtags in the '[recent](https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets)' twitterVerse. 
 
@@ -270,7 +276,7 @@ deMacron <- function(original){
 htLongDT <- htLongDT[,htClean := stringr::str_replace_all(htLower,"[āēīōū]",deMacron)]
 ```
 
-This is very quick and dirty but... Table \@ref(tab:tweetTable) shows the total count of each #hashtag by (re)tweet type. With thanks to [David Hood](https://twitter.com/Thoughtfulnz/status/1046685305569345536) for code to help make sure that kakī == kaki.
+This is very quick and dirty but... Table \@ref(tab:tweetTable) shows the total count of each #hashtag by (re)tweet type. With thanks to [David Hood](https://twitter.com/Thoughtfulnz/status/1046685305569345536) for code to help make sure that kakī == kaki ([etc](https://kupu.maori.nz/about/macrons-keyboard-setup)).
 
 
 ```{r tweetTable}
