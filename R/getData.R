@@ -2,7 +2,7 @@
 #'
 #' \code{saveTweets} takes a string and matches it to recent tweets
 #'
-#' Puts the results into a data.table and saves it to ofile using data.table::fwrite (very fast).
+#' Puts the results into a data.table and saves it to ofile using data.table::fwrite (very fast). Gzips the file.
 #'
 #' Returns the data.table for further fun.
 #'
@@ -23,6 +23,7 @@ saveTweets <- function(string,ofile, n = 18000){
   )
   dt <- data.table::as.data.table(t)
   data.table::fwrite(dt, ofile)
+  #hashTagR::gzipIt(ofile) # gzip the file (readr::read_csv can handle .gz files)
   return(dt)
 }
 

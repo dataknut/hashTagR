@@ -25,13 +25,13 @@ rmdFile <- paste0(projLoc, "/analysis/birdOfTheYear2018.Rmd")
 # default code location - needed to load functions & parameters correctly so
 projLoc <- hashTagR::findParentDirectory("hashTagR")
 
-refresh <- 1 # 0 to skip data refresh
+refresh <- 0 # 0 to skip data refresh
 
 # --- code ---
 
 if(refresh){
   dt <- hashTagR::saveTweets(hashtag, oDfile)
-  message("Retreived ", nrow(dt), " tweets and saved them to ", ofile)
+  message("Retreived ", nrow(dt), " tweets and saved them to ", oDfile)
 }
 
 rmarkdown::render(input = rmdFile,

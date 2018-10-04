@@ -26,7 +26,8 @@ tidyNum(c(10^6, 10^7, 10^8))
 
 }
 \seealso{
-Other Utilities: \code{\link{gzipIt}}
+Other Utilities: \code{\link{deMacron}},
+  \code{\link{getLinuxMemProfile}}, \code{\link{gzipIt}}
 }
 \author{
 Ben Anderson, \email{b.anderson@soton.ac.uk}
