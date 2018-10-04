@@ -25,7 +25,7 @@ rmdFile <- paste0(projLoc, "/analysis/birdOfTheYear2018.Rmd")
 # default code location - needed to load functions & parameters correctly so
 projLoc <- hashTagR::findParentDirectory("hashTagR")
 
-refresh <- 1 # 0 to skip data refresh
+refresh <- 0 # 0 to skip data refresh
 
 # --- code ---
 
@@ -41,7 +41,7 @@ rmarkdown::render(input = rmdFile,
 )
 
 # construct git commit
-cmsg <- paste0("Latest #birdOfTheYear data refresh & replot: ", lubridate::now())
+cmsg <- paste0("'Latest #birdOfTheYear data refresh & replot: ", lubridate::now(), "'")
 gc <- paste0("git commit -a -m ", cmsg)
 try(system(gc))
 gpl <- "git pull"
