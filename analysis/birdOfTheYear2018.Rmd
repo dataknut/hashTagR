@@ -159,7 +159,7 @@ myPlot
 
 ```
 
-Figure \@ref(fig:allDaysChart) shows the number of tweets and tweeters in the data extract by day. The quotes, tweets and re-tweets have been separated. Looks to me like there's quite a lot of activity at weekends...
+Figure \@ref(fig:allDaysChart) shows the number of tweets and tweeters in the data extract by day. The quotes, tweets and re-tweets have been separated.
 
 If you are in New Zealand and you are wondering why there are no tweets `today` (`r lubridate::today()`) the answer is that twitter data (and these plots) are working in UTC and (y)our `today()` may not have started yet in UTC. Don't worry, all the tweets are here - it's just our old friend the timezone... :-)
 
