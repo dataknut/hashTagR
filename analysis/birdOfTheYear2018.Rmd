@@ -277,7 +277,9 @@ kableExtra::kable(caption = "Top 20 hashtags in tweets containing #birdoftheyear
   kable_styling()
 ```
 
-Figure \@ref(fig:plotHashtags) plots the daily occurence of these hashtags after removing variants of `#birdOfTheYear` and `#boty` and selecting only those which have more than `r threshold` mentions on any day. Tweets mentioning birds without using a `#<birdName>` hashtag will not show up and we still have the kakī != kaki issue so this is a _really_ imperfect measure.  For clarity we have not separated tweets from re-tweets. #YMMV.
+Figure \@ref(fig:plotHashtags) plots the daily occurence of these hashtags after removing variants of `#birdOfTheYear` and `#boty` and selecting only those which have more than `r threshold` mentions on any day.
+
+For clarity we have not separated tweets from re-tweets. #YMMV.
 
 ```{r plotHashtags, fig.height=8, fig.cap="Most mentioned #hashtags per day"}
 
@@ -313,7 +315,7 @@ But if the hashtags have any predictive value at all then Figure \@ref(fig:cumul
 
 \@ref(fig:cumulativeHtCounts) uses `plotly` to avoid having to render a large legend - just hover over the lines to see who is who...
 
-```{r cumulativeHtCounts, fig.cap="Cumulative hashtag counts"}
+```{r cumulativeHtCounts, fig.cap="Cumulative hashtag counts over time"}
 plotDT <- htTabDT[, .(count = sum(count)), keyby = .(ba_obsDate,htClean)]
 plotDT <- plotDT[, cumCount := cumsum(count), by = htClean]
 plotDT <- plotDT[, maxCount := max(cumCount), by = htClean] # so we can filter
@@ -327,13 +329,13 @@ linePlot <- ggplot2::ggplot(plotDT[maxCount > 30], aes(x = ba_obsDate, y = cumCo
   theme(legend.title = element_blank()) +
   labs(caption = paste0(dataCap,"\nReverse alphabetical order"),
        x = "Date",
-       y = "Cumulative count"
+       y = "Cumulative count per day"
   )
 
 plotly::ggplotly(linePlot)
 ```
 
-```{r htCountsTodate, fig.cap="Cumulative hashtag counts"}
+```{r htCountsTodate, fig.cap="Total hashtag counts to date"}
 plotDT <- htTabDT[, .(count = sum(count)), keyby = .(htClean)]
 
 plotDT <- plotDT[, htCleanOr := reorder(htClean, -count)]
@@ -350,6 +352,16 @@ ggplot2::ggplot(plotDT[count > 30], aes(x = htCleanOr, y = count, fill = htClean
   )
 ```
 
+# Problems with counting #hashtags
+
+Loads of them. But primarily:
+
+ * tweets mentioning birds without using a `#<birdName>` hashtag (like [this rather popular one](https://twitter.com/BillBailey/status/1046965452063293447)) will not show up;
+ * we still have the kakī != kaki macron related issue.
+ 
+> => this is a _really_ imperfect measure.  
+
+[#YMMV](https://dictionary.cambridge.org/dictionary/english/ymmv)
 
 # About
 
