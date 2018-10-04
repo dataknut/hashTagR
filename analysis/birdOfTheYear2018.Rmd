@@ -277,7 +277,7 @@ kableExtra::kable(caption = "Top 20 hashtags in tweets containing #birdoftheyear
   kable_styling()
 ```
 
-Figure \@ref(fig:plotHashtags) plots the daily occurence of these hashtags after removing variants of `#birdOfTheYear` and `#boty` and selecting only those which have more than `r threshold` mentions on any day.
+Figure \@ref(fig:plotHashtags) plots the daily occurence of these hashtags after removing variants of `#birdOfTheYear` and `#boty` and selecting only those which have more than `r threshold` mentions on any day. See Section \@ref(problems) for the problems with this approach.
 
 For clarity we have not separated tweets from re-tweets. #YMMV.
 
@@ -311,7 +311,7 @@ ggplot2::ggplot(htTabDT[count > threshold], aes(x = ba_obsDate, y = htClean, fil
 
 No idea. 
 
-But if the hashtags have any predictive value at all then Figure \@ref(fig:cumulativeHtCounts) should be an indicator of the direction of travel (watch for lines of apparently dis-similar hashtags where the macron fix has failed) and \@ref(fig:htCountsTodate) shows the totals to date.
+There are _a lot_ of problems with this approach (see Section \@ref(problems)) but if the hashtags have any predictive value at all then Figure \@ref(fig:cumulativeHtCounts) should be an indicator of the direction of travel (watch for lines of apparently dis-similar hashtags where the macron fix has failed) and \@ref(fig:htCountsTodate) shows the totals to date.
 
 \@ref(fig:cumulativeHtCounts) uses `plotly` to avoid having to render a large legend - just hover over the lines to see who is who...
 
@@ -352,7 +352,7 @@ ggplot2::ggplot(plotDT[count > 30], aes(x = htCleanOr, y = count, fill = htClean
   )
 ```
 
-# Problems with counting #hashtags
+# Problems with counting #hashtags {#problems}
 
 Loads of them. But primarily:
 
