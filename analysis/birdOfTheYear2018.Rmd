@@ -285,6 +285,10 @@ kableExtra::kable(caption = "Top 20 hashtags in tweets containing #birdoftheyear
   kable_styling()
 ```
 
+```{r setPlotThreshold}
+threshold <- 10
+```
+
 Figure \@ref(fig:plotHashtags) plots the daily occurence of these hashtags after removing variants of `#birdOfTheYear` and `#boty` and selecting only those which have more than `r threshold` mentions on any day. For clarity tweets and re-tweets are aggregated. See Section \@ref(problems) for the problems with this #hashTag counting approach.
 
 ```{r plotHashtags, fig.height=8, fig.cap="Most mentioned #hashtags per day"}
@@ -294,8 +298,6 @@ testDT <- htLongDT[!(grepl("birdoftheyear",htClean,ignore.case = TRUE) |
                 grepl("boty",htClean,ignore.case = TRUE) )]
 
 htTabDT <- testDT[, .(count = .N), keyby = .(ba_obsDate, htClean, ba_tweetType)]
-
-threshold <- 10
 
 ggplot2::ggplot(htTabDT[count > threshold], aes(x = ba_obsDate, y = htClean, fill = count)) +
   geom_tile() + 
