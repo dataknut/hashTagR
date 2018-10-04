@@ -4,20 +4,25 @@
 \alias{loadTweets}
 \title{Loads tweets that match a given search string from a pre-saved file}
 \usage{
-loadTweets(path, string)
+loadTweets(path, pattern, recursive = TRUE)
 }
 \arguments{
-\item{path}{place to look for saved file - gets passed to readr::read_csv so can be anything read_csv can readr :-)}
+\item{path}{place to look for saved file - gets passed to list.files()}
 
-\item{string}{the string to look for}
+\item{pattern}{the pattern to match - passed to list.files()}
+
+\item{recursive}{use recursively (default = TRUE)}
 }
 \description{
 \code{loadTweets} takes a string and loads all files in a given path which have this name using readr
 }
 \details{
-Assumes (but checks) files were previously created using saveTweets
+If no matches, returns nothing but gives feedback.
 
-Puts the results into a tbl and returns them.
+If there are matches, rbinds them all into a tbl, gives feedback and returns the tbl for further fun.
+
+Note that list.files() is recursive by default. This can lead to large search times if you start it at
+  the top of a file structure. Use wisely.
 }
 \author{
 Ben Anderson, \email{b.anderson@soton.ac.uk}
