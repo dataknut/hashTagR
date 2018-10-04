@@ -321,9 +321,9 @@ No idea.
 
 There are _a lot_ of problems with this approach (see Section \@ref(problems)) but if the hashtags have any predictive value at all then Figure \@ref(fig:cumulativeHtCounts) should be an indicator of the direction of travel (watch for lines of apparently dis-similar hashtags where the macron fix has failed) and Figure \@ref(fig:htCountsTodate) shows the totals to date.
 
-Figure \@ref(fig:cumulativeHtCounts) uses `plotly` to avoid having to render a large legend - just hover over the lines to see who is who...
+Figure \@ref(fig:cumulativeHtCounts) uses [plotly](https://plot.ly/r/) to avoid having to render a large legend - just hover over the lines to see who is who...
 
-```{r cumulativeHtCounts, fig.cap="Cumulative hashtag counts over time"}
+```{r cumulativeHtCounts, fig.cap="Cumulative hashtag counts over time (only total count > 30 shown)"}
 plotDT <- htTabDT[, .(count = sum(count)), keyby = .(ba_obsDate,htClean)]
 plotDT <- plotDT[, cumCount := cumsum(count), by = htClean]
 plotDT <- plotDT[, maxCount := max(cumCount), by = htClean] # so we can filter
@@ -335,7 +335,7 @@ linePlot <- ggplot2::ggplot(plotDT[maxCount > 30], aes(x = ba_obsDate, y = cumCo
   scale_x_date(date_breaks = "1 day", date_labels = "%a %d %b %Y") +
   theme(legend.position = "none") +
   theme(legend.title = element_blank()) +
-  labs(caption = paste0(dataCap,"\nReverse alphabetical order"),
+  labs(caption = paste0(dataCap),
        x = "Date",
        y = "Cumulative count per day"
   )
@@ -343,7 +343,7 @@ linePlot <- ggplot2::ggplot(plotDT[maxCount > 30], aes(x = ba_obsDate, y = cumCo
 plotly::ggplotly(linePlot)
 ```
 
-```{r htCountsTodate, fig.cap="Total hashtag counts to date"}
+```{r htCountsTodate, fig.cap="Total hashtag counts to date (only total count > 30 shown)"}
 plotDT <- htTabDT[, .(count = sum(count)), keyby = .(htClean)]
 
 plotDT <- plotDT[, htCleanOr := reorder(htClean, -count)]
