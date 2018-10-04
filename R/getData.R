@@ -28,12 +28,16 @@ saveTweets <- function(string,ofile, n = 18000){
 #'
 #' \code{loadTweets} takes a string and loads all files in a given path which have this name using readr
 #'
-#'   Assumes (but checks) files were previously created using saveTweets
+#'   If no matches, returns nothing but gives feedback.
 #'
-#'   Puts the results into a tbl and returns them.
+#'   If there are matches, rbinds them all into a tbl, gives feedback and returns the tbl for further fun.
 #'
-#' @param path place to look for saved file - gets passed to readr::read_csv so can be anything read_csv can readr :-)
-#' @param string the string to look for
+#'   Note that list.files() is recursive by default. This can lead to large search times if you start it at
+#'   the top of a file structure. Use wisely.
+#'
+#' @param path place to look for saved file - gets passed to list.files()
+#' @param pattern the pattern to match - passed to list.files()
+#' @param recursive use recursively (default = TRUE)
 #'
 #' @import readr
 #' @import data.table
@@ -42,9 +46,9 @@ saveTweets <- function(string,ofile, n = 18000){
 #' @export
 #'
 
-loadTweets <- function(path, string){
-  fileList <- list.files(path = path, pattern = string, # use to filter e.g. 1m from 30s files
-                      recursive = TRUE)
+loadTweets <- function(path, pattern, recursive = TRUE){
+  fileList <- list.files(path = path, pattern = pattern, # use to filter e.g. 1m from 30s files
+                      recursive = recursive)
   if(length(fileList) > 0){
     fListDT <- data.table::as.data.table(fileList)
     fListDT <- fListDT[, fullPath := paste0(path, fileList)]
@@ -57,7 +61,7 @@ loadTweets <- function(path, string){
                    )
     )
     fb <-paste0("Found ", nrow(fListDT), " files matching ",
-            string, " in ",
+                pattern, " in ",
             path)
     print(fb)
     return(tbl)
