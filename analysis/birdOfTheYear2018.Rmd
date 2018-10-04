@@ -313,7 +313,7 @@ No idea.
 
 There are _a lot_ of problems with this approach (see Section \@ref(problems)) but if the hashtags have any predictive value at all then Figure \@ref(fig:cumulativeHtCounts) should be an indicator of the direction of travel (watch for lines of apparently dis-similar hashtags where the macron fix has failed) and \@ref(fig:htCountsTodate) shows the totals to date.
 
-\@ref(fig:cumulativeHtCounts) uses `plotly` to avoid having to render a large legend - just hover over the lines to see who is who...
+Figure \@ref(fig:cumulativeHtCounts) uses `plotly` to avoid having to render a large legend - just hover over the lines to see who is who...
 
 ```{r cumulativeHtCounts, fig.cap="Cumulative hashtag counts over time"}
 plotDT <- htTabDT[, .(count = sum(count)), keyby = .(ba_obsDate,htClean)]
