@@ -256,20 +256,20 @@ message("That's about ~ ", round(nrow(htLongDT)/nrow(twDT),2), " hashtags per tw
 htLongDT <- htLongDT[, htOrig := value]
 # so that TeamKakī == TeamKaki & takahe == takahē etc https://twitter.com/Thoughtfulnz/status/1046685305569345536
 
-macron <- c("ā", "ē", "ī", "ō", "ū") # set macron vowels https://kupu.maori.nz/about/macrons-keyboard-setup
-roman <- c("a", "e", "i", "o", "u") # roman equiv
+htLongDT <- htLongDT[, htLower := tolower(htOrig)] # lower case
 
-# for some reason looping over the above fails... so:
-htLongDT <- htLongDT[, htOrigAnglo := gsub("ā","a", htOrig, fixed = TRUE)] 
-htLongDT <- htLongDT[, htOrigAnglo := gsub("ē","e", htOrig, fixed = TRUE)] 
-htLongDT <- htLongDT[, htOrigAnglo := gsub("ī","i", htOrig, fixed = TRUE)] 
-htLongDT <- htLongDT[, htOrigAnglo := gsub("ō","o", htOrig, fixed = TRUE)] 
-htLongDT <- htLongDT[, htOrigAnglo := gsub("ū","u", htOrig, fixed = TRUE)] 
+# kakī != kaki
+deMacron <- function(original){
+  # with thanks to https://twitter.com/Thoughtfulnz/status/1047648312810033152
+  macron <- c("ā", "ē", "ī", "ō", "ū") # set macron vowels https://kupu.maori.nz/about/macrons-keyboard-setup
+  nonMacron <- c("a", "e", "i", "o", "u") # roman equiv
+  return(nonMacron[which(original == macron)])
+}
 
-htLongDT <- htLongDT[, htClean := tolower(htOrigAnglo)] # lower case
+htLongDT <- htLongDT[,htClean := stringr::str_replace_all(htLower,"[āēīōū]",deMacron)]
 ```
 
-This is very quick and dirty but... Table \@ref(tab:tweetTable) shows the total count of each #hashtag. Note that I have tried to [de-macron](https://kupu.maori.nz/about/macrons-keyboard-setup) the vowels so that kakī == kaki (for example) but it is currently not working.
+This is very quick and dirty but... Table \@ref(tab:tweetTable) shows the total count of each #hashtag with thanks to [David Hood](https://twitter.com/Thoughtfulnz/status/1046685305569345536) for code to help make sure that kakī != kaki.
 
 ```{r tweetTable}
 kableExtra::kable(caption = "Top 20 hashtags in tweets containing #birdoftheyear or #boty",
