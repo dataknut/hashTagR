@@ -13,13 +13,13 @@ print(paste0("Loading the following libraries: ", reqLibs))
 hashTagR::loadLibraries(reqLibs)
 
 # --- set params ----
-projLoc <- hashTagR::findParentDirectory("hashTagR")
-hashtag <- "#birdoftheyear OR #boty" # see ?search_tweets - capitals are ignored (I think)
-oDfile <- paste0("~/Data/twitter/tw_", hashtag,"_", lubridate::now(),".csv")
-ofile <- paste0(projLoc, "/docs/birdOfTheYear2018.html")
+projLoc <- hashTagR::findParentDirectory("hashTagR") # <- project location
+hashtag <- "#birdoftheyear OR #boty" # <- what to search for - see ?search_tweets - capitals are ignored (I think)
+oDfile <- paste0("~/Data/twitter/tw_", hashtag,"_", lubridate::now(),".csv") # <- data file
+ofile <- paste0(projLoc, "/docs/birdOfTheYear2018.html") # <- html output file
 explHashTag <- 'https://twitter.com/hashtag/birdoftheyear' # <- explanatory link for the hashtag
 pubUrl <- paste0("https://dataknut.github.io/hashTagR/", ofile) # <- where the results are published
-rmdFile <- paste0(projLoc, "/analysis/birdOfTheYear2018.Rmd")
+rmdFile <- paste0(projLoc, "/analysis/birdOfTheYear2018.Rmd") # <- the Rmd code to render
 
 
 # default code location - needed to load functions & parameters correctly so
