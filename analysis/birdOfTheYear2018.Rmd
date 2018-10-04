@@ -115,7 +115,7 @@ The data has:
 
 ```{r setCaptionTimeSeries}
 dataCap <- paste0("Source: Data collected from Twitter's REST API via rtweet",
-                  "\nAll (re)tweets and quotes and quotes containing ", params$hashtag, 
+                  "\nAll (re)tweets and quotes containing ", params$hashtag, 
                     " from ",
                       min(twDT$created_at),
                     " to ",
@@ -285,11 +285,11 @@ Figure \@ref(fig:plotHashtags) plots the daily occurence of these hashtags after
 testDT <- htLongDT[!(grepl("birdoftheyear",htClean,ignore.case = TRUE) | 
                 grepl("boty",htClean,ignore.case = TRUE) )]
 
-tab <- testDT[, .(count = .N), keyby = .(ba_obsDate, htClean, ba_tweetType)]
+htTabDT <- testDT[, .(count = .N), keyby = .(ba_obsDate, htClean, ba_tweetType)]
 
 threshold <- 10
 
-ggplot2::ggplot(tab[count > threshold], aes(x = ba_obsDate, y = htClean, fill = count)) +
+ggplot2::ggplot(htTabDT[count > threshold], aes(x = ba_obsDate, y = htClean, fill = count)) +
   geom_tile() + 
   theme(strip.text.y = element_text(size = 9, colour = "black", angle = 0)) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.5)) +
@@ -304,6 +304,52 @@ ggplot2::ggplot(tab[count > threshold], aes(x = ba_obsDate, y = htClean, fill = 
   )
   
 ```
+
+# So who's gonna win? {#cumulative}
+
+No idea. 
+
+But if the hashtags have any predictive value at all then Figure \@ref(fig:cumulativeHtCounts) should be an indicator of the direction of travel (watch for lines of apparently dis-similar hashtags where the macron fix has failed) and \@ref(fig:htCountsTodate) shows the totals to date.
+
+\@ref(fig:cumulativeHtCounts) uses `plotly` to avoid having to render a large legend - just hover over the lines to see who is who...
+
+```{r cumulativeHtCounts, fig.cap="Cumulative hashtag counts"}
+plotDT <- htTabDT[, .(count = sum(count)), keyby = .(ba_obsDate,htClean)]
+plotDT <- plotDT[, cumCount := cumsum(count), by = htClean]
+plotDT <- plotDT[, maxCount := max(cumCount), by = htClean] # so we can filter
+
+linePlot <- ggplot2::ggplot(plotDT[maxCount > 30], aes(x = ba_obsDate, y = cumCount, colour = htClean)) +
+  geom_line() + 
+  theme(strip.text.y = element_text(size = 9, colour = "black", angle = 0)) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.5)) +
+  scale_x_date(date_breaks = "1 day", date_labels = "%a %d %b %Y") +
+  theme(legend.position = "none") +
+  theme(legend.title = element_blank()) +
+  labs(caption = paste0(dataCap,"\nReverse alphabetical order"),
+       x = "Date",
+       y = "Cumulative count"
+  )
+
+plotly::ggplotly(linePlot)
+```
+
+```{r htCountsTodate, fig.cap="Cumulative hashtag counts"}
+plotDT <- htTabDT[, .(count = sum(count)), keyby = .(htClean)]
+
+plotDT <- plotDT[, htCleanOr := reorder(htClean, -count)]
+
+ggplot2::ggplot(plotDT[count > 30], aes(x = htCleanOr, y = count, fill = htCleanOr)) +
+  geom_col() + 
+  theme(strip.text.y = element_text(size = 9, colour = "black", angle = 0)) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.5)) +
+  theme(legend.position = "none") +
+  theme(legend.title = element_blank()) +
+  labs(caption = paste0(dataCap,"\nOnly count > 30 shown"),
+       x = "hashtag",
+       y = "Count to date"
+  )
+```
+
 
 # About
 
