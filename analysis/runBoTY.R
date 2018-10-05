@@ -13,6 +13,9 @@ print(paste0("Loading the following libraries: ", reqLibs))
 hashTagR::loadLibraries(reqLibs)
 
 # --- set params ----
+refresh <- 1 # 0 to skip data refresh
+goGit <- 0 # 0 to skip git commit
+
 projLoc <- hashTagR::findParentDirectory("hashTagR") # <- project location
 hashtag <- "#birdoftheyear OR #boty" # <- what to search for - see ?search_tweets - capitals are ignored (I think)
 oDfile <- paste0("~/Data/twitter/tw_", hashtag,"_", lubridate::now(),".csv") # <- data file
@@ -21,11 +24,6 @@ explHashTag <- 'https://twitter.com/hashtag/birdoftheyear' # <- explanatory link
 pubUrl <- paste0("https://dataknut.github.io/hashTagR/", ofile) # <- where the results are published
 rmdFile <- paste0(projLoc, "/analysis/birdOfTheYear2018.Rmd") # <- the Rmd code to render
 
-
-# default code location - needed to load functions & parameters correctly so
-projLoc <- hashTagR::findParentDirectory("hashTagR")
-
-refresh <- 1 # 0 to skip data refresh
 
 # --- code ---
 
@@ -40,11 +38,13 @@ rmarkdown::render(input = rmdFile,
                   output_file = ofile
 )
 
-# construct git commit
-cmsg <- paste0("'Latest #birdOfTheYear data refresh & replot: ", lubridate::now(), "'")
-gc <- paste0("git commit -a -m ", cmsg)
-try(system(gc))
-gpl <- "git pull"
-try(system(gpl))
-gpu <- "git push origin refs/heads/master"
-try(system(gpu))
+if(goGit){
+  # construct git commit
+  cmsg <- paste0("'Latest #birdOfTheYear data refresh & replot: ", lubridate::now(), "'")
+  gc <- paste0("git commit -a -m ", cmsg)
+  try(system(gc))
+  gpl <- "git pull"
+  try(system(gpl))
+  gpu <- "git push origin refs/heads/master"
+  try(system(gpu))
+}
