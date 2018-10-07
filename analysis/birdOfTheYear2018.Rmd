@@ -40,6 +40,7 @@ startTime <- proc.time()
 # additional libs required by this code
 reqLibs <- c("data.table",
              "ggplot2",  
+             "plotly",
              "readr", 
              "reshape2",
              "stringr",
@@ -405,6 +406,7 @@ Other R packages used:
  * base R - for the basics [@baseR]
  * data.table - for fast (big) data handling [@data.table]
  * ggplot2 - for slick graphs [@ggplot2]
+ * plotly - for interactive graphs [@plotly]
  * readr - for nice data loading [@readr]
  * reshape2 - wide to long [@reshape2]
  * rtweet - twitter API search [@rtweet-package]
