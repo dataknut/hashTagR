@@ -311,7 +311,7 @@ threshold <- 10
 
 Figure \@ref(fig:plotHashtags) plots the daily occurence of these hashtags after removing variants of `r searchString` and selecting only those which have more than `r threshold` mentions on any day. For clarity tweets and re-tweets are aggregated. See Section \@ref(problems) for the problems with this #hashTag counting approach.
 
-```{r plotHashtags, fig.height=8, fig.cap=paste0("Most mentioned #hashtags per day (only > ", threshold, " per day shown)"}
+```{r plotHashtags, fig.height=8, fig.cap=paste0("Most mentioned #hashtags per day (only > ", threshold, " per day shown)")}
 
 # remove the hashtags we searched for
 testDT <- htLongDT
