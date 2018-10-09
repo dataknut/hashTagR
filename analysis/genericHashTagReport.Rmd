@@ -338,12 +338,12 @@ There are _a lot_ of problems with this approach (see Section \@ref(problems)) b
 
 Figure \@ref(fig:cumulativeHtCounts) uses [plotly](https://plot.ly/r/) to avoid having to render a large legend - just hover over the lines to see who is who...
 
-```{r cumulativeHtCounts, fig.cap="Cumulative hashtag counts over time (only total count > 30 shown)"}
+```{r cumulativeHtCounts, fig.cap=`r paste0("Cumulative hashtag counts over time (only total count >", threshold, " shown)")'}
 plotDT <- htTabDT[, .(count = sum(count)), keyby = .(ba_obsDate,htClean)]
 plotDT <- plotDT[, cumCount := cumsum(count), by = htClean]
 plotDT <- plotDT[, maxCount := max(cumCount), by = htClean] # so we can filter
 
-linePlot <- ggplot2::ggplot(plotDT[maxCount > 30], aes(x = ba_obsDate, y = cumCount, colour = htClean)) +
+linePlot <- ggplot2::ggplot(plotDT[maxCount > threshold], aes(x = ba_obsDate, y = cumCount, colour = htClean)) +
   geom_line() + 
   theme(strip.text.y = element_text(size = 9, colour = "black", angle = 0)) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.5)) +
@@ -358,12 +358,12 @@ linePlot <- ggplot2::ggplot(plotDT[maxCount > 30], aes(x = ba_obsDate, y = cumCo
 plotly::ggplotly(linePlot)
 ```
 
-```{r htCountsTodate, fig.cap="Total hashtag counts to date (only total count > 30 shown)"}
+```{r htCountsTodate, fig.cap=`r paste0("Total hashtag counts to date (only total count > ", threshold, " shown)")'}
 plotDT <- htTabDT[, .(count = sum(count)), keyby = .(htClean)]
 
 plotDT <- plotDT[, htCleanOr := reorder(htClean, -count)]
 
-ggplot2::ggplot(plotDT[count > 30], aes(x = htCleanOr, y = count, fill = htCleanOr)) +
+ggplot2::ggplot(plotDT[count > threshold], aes(x = htCleanOr, y = count, fill = htCleanOr)) +
   geom_col() + 
   theme(strip.text.y = element_text(size = 9, colour = "black", angle = 0)) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.5)) +

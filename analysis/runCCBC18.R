@@ -14,7 +14,7 @@ hashTagR::loadLibraries(reqLibs)
 
 # --- set params ----
 refresh <- 1 # 0 to skip data refresh
-goGit <- 0 # 0 to skip git commit
+goGit <- 1 # 0 to skip git commit
 
 projLoc <- hashTagR::findParentDirectory("hashTagR") # <- project location
 hashtags <- c("edsclimatechat","ccbc18") # a list of the hashtags to search for - see ?search_tweets
