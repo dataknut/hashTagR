@@ -306,12 +306,12 @@ kableExtra::kable(caption = "Top 20 hashtags",
 ```
 
 ```{r setPlotThreshold}
-threshold <- 5
+threshold <- 10
 ```
 
 Figure \@ref(fig:plotHashtags) plots the daily occurence of these hashtags after removing variants of `r searchString` and selecting only those which have more than `r threshold` mentions on any day. For clarity tweets and re-tweets are aggregated. See Section \@ref(problems) for the problems with this #hashTag counting approach.
 
-```{r plotHashtags, fig.height=8, fig.cap="Most mentioned #hashtags per day"}
+```{r plotHashtags, fig.height=8, fig.cap=paste0("Most mentioned #hashtags per day (only > ", threshold, " per day shown)"}
 
 # remove the hashtags we searched for
 testDT <- htLongDT
@@ -323,7 +323,7 @@ for(n in 1:length(hashTags)){
 
 htTabDT <- testDT[, .(count = .N), keyby = .(ba_obsDate, htClean, ba_tweetType)]
 
-ggplot2::ggplot(htTabDT, aes(x = ba_obsDate, y = htClean, fill = count)) +
+ggplot2::ggplot(htTabDT[count > threshold], aes(x = ba_obsDate, y = htClean, fill = count)) +
   geom_tile() + 
   theme(strip.text.y = element_text(size = 9, colour = "black", angle = 0)) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.5)) +
