@@ -99,7 +99,7 @@ It is therefore possible that not quite all tweets have been extracted although 
 ```{r load Data}
 # load from pre-collected ----
 message("Load from pre-collected data and check for duplicates")
-# https://github.com/dataknut/hashTagR/blob/master/dataProcessing/getBoTY.R
+
 raw_twDT <- hashTagR::loadTweets(dPath, params$searchString) # we like data.tables
 
 # this data.table will have duplicate entries because:
@@ -218,7 +218,7 @@ kableExtra::kable(caption = "Top 15 tweeters (all days)",
 
 And their tweetStreaks are shown in Figure \@ref(fig:screenNameTop50)...
 
-```{r screenNameTop50, fig.height=8,fig.cap="N tweets per day minutes by screen name (top 50, reverse alphabetical)"}
+```{r screenNameTop50, fig.height=8,fig.cap="N tweets per day by screen name (top 50, reverse alphabetical)"}
 myDataCap <- paste0(dataCap,
                     "\nScreen names in reverse alphabetical order"
                           )
@@ -382,7 +382,7 @@ Loads of them. But primarily:
  * hashTags as indicators: 
     * tweets mentioning a topic without using a hashtag will not show up so;
     * there is no sentiment analysis;
- * removing the macrons: the tables and plots display incorrect Māori names. Unfortunately I have not found a way to put them back in the right words (and only the right words).
+ * removing the macrons: the tables and plots may display incorrect Māori words. Unfortunately I have not found a way to put them back in the right words (and only the right words).
 
 # About
 
