@@ -68,7 +68,7 @@ Just a bit of [dataknut](https://twitter.com/dataknut) fun woven around the [day
 
 ## License
 
-[CC-BY-SA](https://creativecommons.org/licenses/by-sa/4.0/) unless otherwise noted.
+[CC-BY](https://creativecommons.org/licenses/by/4.0/) unless otherwise noted.
 
 ## Citation
 
