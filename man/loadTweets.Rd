@@ -25,6 +25,11 @@ If there are matches, rbinds them all into a tbl, gives feedback and returns the
 Note that list.files() is recursive by default. This can lead to large search times if you start it at
   the top of a file structure. Use wisely.
 }
+\seealso{
+Other tweets: \code{\link{createSearchFromTags}},
+  \code{\link{saveTweets}}
+}
 \author{
 Ben Anderson, \email{b.anderson@soton.ac.uk}
 }
+\concept{tweets}

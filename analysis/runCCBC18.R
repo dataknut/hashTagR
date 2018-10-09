@@ -13,7 +13,7 @@ print(paste0("Loading the following libraries: ", reqLibs))
 hashTagR::loadLibraries(reqLibs)
 
 # --- set params ----
-refresh <- 0 # 0 to skip data refresh
+refresh <- 1 # 0 to skip data refresh
 goGit <- 0 # 0 to skip git commit
 
 projLoc <- hashTagR::findParentDirectory("hashTagR") # <- project location

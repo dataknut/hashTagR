@@ -21,6 +21,11 @@ Puts the results into a data.table and saves it to ofile using data.table::fwrit
 
 Returns the data.table for further fun.
 }
+\seealso{
+Other tweets: \code{\link{createSearchFromTags}},
+  \code{\link{loadTweets}}
+}
 \author{
 Ben Anderson, \email{b.anderson@soton.ac.uk}
 }
+\concept{tweets}
