@@ -17,7 +17,7 @@ refresh <- 1 # 0 to skip data refresh
 goGit <- 1 # 0 to skip git commit
 
 projLoc <- myUtils::findParentDirectory("hashTagR") # <- project location
-hashtags <- c("edsclimatechat","ccbc18") # a list of the hashtags to search for - see ?search_tweets
+hashtags <- c("edsclimatechat","ccbc18", "ccbc2018") # a list of the hashtags to search for - see ?search_tweets
 searchString <- hashTagR::createSearchFromTags(hashtags)
 
 oDfile <- paste0("~/Data/twitter/tw_", searchString,"_", lubridate::now(),".csv") # <- data file
