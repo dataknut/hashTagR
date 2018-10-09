@@ -56,6 +56,8 @@ print(paste0("Loading the following libraries: ", reqLibs))
 
 ```{r set parameters}
 dPath <- "~/Data/twitter/"
+hashTags <- params$hashTags
+searchStrng <- params$searchString
 ```
 
 # TL;DR
@@ -72,7 +74,7 @@ Just a bit of [dataknut](https://twitter.com/dataknut) fun woven around the [day
 
 ## Citation
 
- * Anderson, B (`r lubridate::year(today())`) _Twitter hashtag analysis: `r params$searchString`_. Downloaded from: `r params$pubUrl`.
+ * Anderson, B (`r lubridate::year(today())`) _Twitter hashtag analysis: `r searchString`_. Downloaded from: `r params$pubUrl`.
 
 ## Code
 
@@ -84,7 +86,7 @@ See:
  
 # Purpose
 
-The idea is to extract and visualise tweets and re-tweets of _`r params$searchString`_ (see `r params$explHashTag`).
+The idea is to extract and visualise tweets and re-tweets of _`r searchString`_ (see `r params$explHashTag`).
 
 Why? Err.... Just. Because.
 
@@ -92,7 +94,7 @@ Why? Err.... Just. Because.
 
 Code borrows extensively from https://github.com/mkearney/rtweet
 
-The analysis used `rtweet` to ask the Twitter search API to extract 'all' tweets containing the _`r params$searchString`_ hashtags in the '[recent](https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets)' twitterVerse. 
+The analysis used `rtweet` to ask the Twitter search API to extract 'all' tweets containing the _`r searchString`_ hashtags in the '[recent](https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets)' twitterVerse. 
 
 It is therefore possible that not quite all tweets have been extracted although it seems likely that we have captured most recent `human` tweeting which was the main intention. Future work should instead use the Twitter [streaming API](https://dev.twitter.com/streaming/overview).
 
@@ -100,7 +102,11 @@ It is therefore possible that not quite all tweets have been extracted although 
 # load from pre-collected ----
 message("Load from pre-collected data and check for duplicates")
 
-raw_twDT <- hashTagR::loadTweets(dPath, params$searchString) # we like data.tables
+raw_twDT <- hashTagR::loadTweets(dPath, searchString) # we like data.tables
+
+# for testing
+# raw_twDT <- hashTagR::loadTweets(dPath, searchString) # we like data.tables
+
 
 # this data.table will have duplicate entries because:
 # 1. we may have run the search mutiple times
@@ -134,7 +140,7 @@ The data has:
 
 ```{r setCaptionTimeSeries}
 dataCap <- paste0("Source: Data collected from Twitter's REST API via rtweet",
-                  "\nAll (re)tweets and quotes containing ", params$searchString, 
+                  "\nAll (re)tweets and quotes containing ", searchString, 
                     " from ",
                       min(twDT$created_at),
                     " to ",
@@ -300,24 +306,24 @@ kableExtra::kable(caption = "Top 20 hashtags",
 ```
 
 ```{r setPlotThreshold}
-threshold <- 10
+threshold <- 5
 ```
 
-Figure \@ref(fig:plotHashtags) plots the daily occurence of these hashtags after removing variants of `r params$searchString` and selecting only those which have more than `r threshold` mentions on any day. For clarity tweets and re-tweets are aggregated. See Section \@ref(problems) for the problems with this #hashTag counting approach.
+Figure \@ref(fig:plotHashtags) plots the daily occurence of these hashtags after removing variants of `r searchString` and selecting only those which have more than `r threshold` mentions on any day. For clarity tweets and re-tweets are aggregated. See Section \@ref(problems) for the problems with this #hashTag counting approach.
 
 ```{r plotHashtags, fig.height=8, fig.cap="Most mentioned #hashtags per day"}
 
 # remove the hashtags we searched for
 testDT <- htLongDT
 
-for(n in 1:length(params$hashTags)){
-  testDT <- testDT[!(grepl(params$hashTags[n],htClean,ignore.case = TRUE))]
+for(n in 1:length(hashTags)){
+  testDT <- testDT[!(grepl(hashTags[n],htClean,ignore.case = TRUE))]
 }
 
 
 htTabDT <- testDT[, .(count = .N), keyby = .(ba_obsDate, htClean, ba_tweetType)]
 
-ggplot2::ggplot(htTabDT[count > threshold], aes(x = ba_obsDate, y = htClean, fill = count)) +
+ggplot2::ggplot(htTabDT, aes(x = ba_obsDate, y = htClean, fill = count)) +
   geom_tile() + 
   theme(strip.text.y = element_text(size = 9, colour = "black", angle = 0)) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.5)) +
