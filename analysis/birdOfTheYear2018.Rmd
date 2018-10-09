@@ -50,7 +50,7 @@ reqLibs <- c("data.table",
 
 print(paste0("Loading the following libraries: ", reqLibs))
 # Use Luke's function to require/install/load
-hashTagR::loadLibraries(reqLibs)
+myUtils::loadLibraries(reqLibs)
 ```
 
 ```{r set parameters}
@@ -114,9 +114,9 @@ raw_twDT <- hashTagR::loadTweets(dPath, params$hashtag) # we like data.tables
 rn <- nrow(raw_twDT)
 twDT <- unique(raw_twDT, fromLast = TRUE, by = c("created_at", "screen_name") ) # drop duplicates
 un <- nrow(twDT)
-message("Returning ", hashTagR::tidyNum(un),
+message("Returning ", myUtils::tidyNum(un),
         " tweets after dropping ",
-        hashTagR::tidyNum(rn - un),
+        myUtils::tidyNum(rn - un),
         " duplicates.")
     
 twDT <- twDT[, ba_obsDate := lubridate::date(created_at)]
@@ -287,7 +287,7 @@ htLongDT <- htLongDT[, htLower := tolower(htOrig)] # lower case
 
 # Next we remove the macrons so that TeamKakī == TeamKaki & takahe == takahē etc 
 # h/t: https://twitter.com/Thoughtfulnz/status/1046685305569345536
-htLongDT <- htLongDT[, htClean := stringr::str_replace_all(htLower,"[āēīōū]",hashTagR::deMacron)]
+htLongDT <- htLongDT[, htClean := stringr::str_replace_all(htLower,"[āēīōū]",myUtils::deMacron)]
 
 # Now remove 'team' from a string so that e.g. teamkaki == kaki
 htLongDT <- htLongDT[, htClean := gsub("team", "",htClean)]

@@ -3,20 +3,20 @@
 ####
 
 # --- load libraries ---
-library(hashTagR)
+library(myUtils)
 
 # libs required by this code (.Rmd will call others needed there)
-reqLibs <- c("rmarkdown", "bookdown", "rtweet", "lubridate", "data.table")
+reqLibs <- c("rmarkdown", "bookdown", "rtweet", "lubridate", "data.table", "hashTagR")
 
 print(paste0("Loading the following libraries: ", reqLibs))
 # Use Luke's function to require/install/load
-hashTagR::loadLibraries(reqLibs)
+myUtils::loadLibraries(reqLibs)
 
 # --- set params ----
 refresh <- 1 # 0 to skip data refresh
 goGit <- 1 # 0 to skip git commit
 
-projLoc <- hashTagR::findParentDirectory("hashTagR") # <- project location
+projLoc <- myUtils::findParentDirectory("hashTagR") # <- project location
 hashtag <- "#birdoftheyear OR #boty" # <- what to search for - see ?search_tweets - capitals are ignored (I think)
 oDfile <- paste0("~/Data/twitter/tw_", hashtag,"_", lubridate::now(),".csv") # <- data file
 ofile <- paste0(projLoc, "/docs/birdOfTheYear2018.html") # <- html output file
