@@ -111,9 +111,9 @@ raw_twDT <- hashTagR::loadTweets(dPath, params$searchString) # we like data.tabl
 rn <- nrow(raw_twDT)
 twDT <- unique(raw_twDT, fromLast = TRUE, by = c("created_at", "screen_name") ) # drop duplicates
 un <- nrow(twDT)
-message("Returning ", hashTagR::tidyNum(un),
+message("Returning ", myUtils::tidyNum(un),
         " tweets after dropping ",
-        hashTagR::tidyNum(rn - un),
+        myUtils::tidyNum(rn - un),
         " duplicates.")
     
 twDT <- twDT[, ba_obsDate := lubridate::date(created_at)]
@@ -138,7 +138,8 @@ dataCap <- paste0("Source: Data collected from Twitter's REST API via rtweet",
                     " from ",
                       min(twDT$created_at),
                     " to ",
-                    max(twDT$created_at)
+                    max(twDT$created_at),
+                  " (UTC)"
                     )
 ```
 
@@ -284,7 +285,7 @@ htLongDT <- htLongDT[, htLower := tolower(htOrig)] # lower case
 
 # Next we remove the macrons just in case
 # h/t: https://twitter.com/Thoughtfulnz/status/1046685305569345536
-htLongDT <- htLongDT[, htClean := stringr::str_replace_all(htLower,"[āēīōū]",hashTagR::deMacron)]
+htLongDT <- htLongDT[, htClean := stringr::str_replace_all(htLower,"[āēīōū]",myUtils::deMacron)]
 
 # we might need to do other things here depending on the the context
 ```
@@ -338,7 +339,7 @@ There are _a lot_ of problems with this approach (see Section \@ref(problems)) b
 
 Figure \@ref(fig:cumulativeHtCounts) uses [plotly](https://plot.ly/r/) to avoid having to render a large legend - just hover over the lines to see who is who...
 
-```{r cumulativeHtCounts, fig.cap='`r paste0("Cumulative hashtag counts over time (only total count >", threshold, " shown)")`'}
+```{r cumulativeHtCounts, fig.cap=paste0("Cumulative hashtag counts over time (only total count >", threshold, " shown)")}
 plotDT <- htTabDT[, .(count = sum(count)), keyby = .(ba_obsDate,htClean)]
 plotDT <- plotDT[, cumCount := cumsum(count), by = htClean]
 plotDT <- plotDT[, maxCount := max(cumCount), by = htClean] # so we can filter
@@ -358,7 +359,7 @@ linePlot <- ggplot2::ggplot(plotDT[maxCount > threshold], aes(x = ba_obsDate, y 
 plotly::ggplotly(linePlot)
 ```
 
-```{r htCountsTodate, fig.cap='`r paste0("Total hashtag counts to date (only total count > ", threshold, " shown)")`'}
+```{r htCountsTodate, fig.cap=paste0("Total hashtag counts to date (only total count > ", threshold, " shown)")}
 plotDT <- htTabDT[, .(count = sum(count)), keyby = .(htClean)]
 
 plotDT <- plotDT[, htCleanOr := reorder(htClean, -count)]

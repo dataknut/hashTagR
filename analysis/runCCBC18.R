@@ -3,20 +3,20 @@
 ####
 
 # --- load libraries ---
-library(hashTagR)
+library(myUtils)
 
 # libs required by this code (.Rmd will call others needed there)
-reqLibs <- c("rmarkdown", "bookdown", "rtweet", "lubridate", "data.table")
+reqLibs <- c("rmarkdown", "bookdown", "rtweet", "lubridate", "data.table", "hashTagR")
 
 print(paste0("Loading the following libraries: ", reqLibs))
 # Use Luke's function to require/install/load
-hashTagR::loadLibraries(reqLibs)
+myUtils::loadLibraries(reqLibs)
 
 # --- set params ----
 refresh <- 0 # 0 to skip data refresh
 goGit <- 0 # 0 to skip git commit
 
-projLoc <- hashTagR::findParentDirectory("hashTagR") # <- project location
+projLoc <- myUtils::findParentDirectory("hashTagR") # <- project location
 hashtags <- c("edsclimatechat","ccbc18") # a list of the hashtags to search for - see ?search_tweets
 searchString <- hashTagR::createSearchFromTags(hashtags)
 
