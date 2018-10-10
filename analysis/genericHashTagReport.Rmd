@@ -158,13 +158,13 @@ twDT <- twDT[is_quote == TRUE, ba_tweetType := "Quote"]
 plotDT <- twDT[, .(
                  nTweets = .N,
                  nTweeters = uniqueN(screen_name)
-               ), keyby = .(ba_obsDate, ba_tweetType)]
+               ), keyby = .(obsDateTime = lubridate::floor_date(created_at, "hour")), ba_tweetType)]
 
-  myPlot <- ggplot(plotDT, aes(x = ba_obsDate)) +
+  myPlot <- ggplot(plotDT, aes(x = obsDateTime) +
     geom_line(aes(y = nTweets, colour = "N tweets")) +
     geom_line(aes(y = nTweeters, colour = "N tweeters")) +
     facet_grid(ba_tweetType ~ .) +
-    scale_x_date(date_breaks = "1 day", date_labels = "%a %d %b %Y") +
+    scale_x_date(date_breaks = "1 day", date_labels = "%a %d %b %Y %HH") +
     theme(strip.text.y = element_text(size = 9, colour = "black", angle = 90)) +
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.5)) +
     theme(legend.position = "bottom") +
