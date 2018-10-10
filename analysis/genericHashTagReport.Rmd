@@ -58,6 +58,7 @@ print(paste0("Loading the following libraries: ", reqLibs))
 dPath <- "~/Data/twitter/"
 hashTags <- params$hashTags
 searchStrng <- params$searchString
+timeZone <- "Pacific/Auckland"
 ```
 
 # TL;DR
@@ -121,8 +122,9 @@ message("Returning ", myUtils::tidyNum(un),
         " tweets after dropping ",
         myUtils::tidyNum(rn - un),
         " duplicates.")
-    
-twDT <- twDT[, ba_obsDate := lubridate::date(created_at)]
+
+twDT <- twDT[, created_at_local := lubridate::with_tz(created_at, tzone = timeZone)]
+twDT <- twDT[, ba_obsDate := lubridate::date(created_at_local)]
 twDT <- twDT[, ba_obsTime := hms::as.hms(created_at)] # this will auto-convert to local time
 
 ```
@@ -131,7 +133,7 @@ The data has:
 
  * `r tidyNum(nrow(twDT))` tweets (including `r tidyNum(nrow(twDT[is_quote == "TRUE"]))` quotes and `r tidyNum(nrow(twDT[is_retweet == "TRUE"]))` re-tweets) 
  * from `r tidyNum(uniqueN(twDT$screen_name))` tweeters 
- * between `r min(twDT$created_at)` and `r max(twDT$created_at)` (UTC).
+ * between `r min(twDT$created_at_local)` and `r max(twDT$created_at_local)` (`r timeZone`).
 
 # Analysis
 
@@ -142,10 +144,10 @@ The data has:
 dataCap <- paste0("Source: Data collected from Twitter's REST API via rtweet",
                   "\nAll (re)tweets and quotes containing ", searchString, 
                     " from ",
-                      min(twDT$created_at),
+                      min(twDT$created_at_local),
                     " to ",
-                    max(twDT$created_at),
-                  " (UTC)"
+                    max(twDT$created_at_local),
+                  " (", timeZone, ")"
                     )
 ```
 
@@ -154,17 +156,19 @@ dataCap <- paste0("Source: Data collected from Twitter's REST API via rtweet",
 twDT <- twDT[, ba_tweetType := "Tweet"]
 twDT <- twDT[is_retweet == TRUE, ba_tweetType := "Re-tweet"]
 twDT <- twDT[is_quote == TRUE, ba_tweetType := "Quote"]
+twDT <- twDT[, obsDateHour := lubridate::floor_date(created_at_local, "hour")]
 
 plotDT <- twDT[, .(
                  nTweets = .N,
                  nTweeters = uniqueN(screen_name)
-               ), keyby = .(obsDateTime = lubridate::floor_date(created_at, "hour")), ba_tweetType)]
+               ), keyby = .(obsDateHour, ba_tweetType)
+               ]
 
-  myPlot <- ggplot(plotDT, aes(x = obsDateTime) +
+myPlot <- ggplot(plotDT, aes(x = obsDateHour)) +
     geom_line(aes(y = nTweets, colour = "N tweets")) +
     geom_line(aes(y = nTweeters, colour = "N tweeters")) +
     facet_grid(ba_tweetType ~ .) +
-    scale_x_date(date_breaks = "1 day", date_labels = "%a %d %b %Y %HH") +
+    scale_x_datetime(breaks ="4 hours", date_labels = "%c") +
     theme(strip.text.y = element_text(size = 9, colour = "black", angle = 90)) +
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.5)) +
     theme(legend.position = "bottom") +
