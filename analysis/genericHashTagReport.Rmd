@@ -37,7 +37,7 @@ knitr::opts_chunk$set(tidy = TRUE) # tidy up code in case echo = TRUE
 startTime <- proc.time()
 
 # Libraries ----
-library(hashTagR)
+library(myUtils)
 
 # additional libs required by this code
 reqLibs <- c("ggplot2",  
@@ -46,12 +46,13 @@ reqLibs <- c("ggplot2",
              "reshape2",
              "stringr",
              "knitr", 
-             "kableExtra"
+             "kableExtra",
+             "hashTagR"
              )
 
 print(paste0("Loading the following libraries: ", reqLibs))
 # Use Luke's function to require/install/load
-
+myUtils::loadLibraries(reqLibs)
 ```
 
 ```{r set parameters}
@@ -164,7 +165,7 @@ plotDT <- twDT[, .(
                ), keyby = .(obsDateHour, ba_tweetType)
                ]
 
-myPlot <- ggplot(plotDT, aes(x = obsDateHour)) +
+myPlot <- ggplot2::ggplot(plotDT, aes(x = obsDateHour)) +
     geom_line(aes(y = nTweets, colour = "N tweets")) +
     geom_line(aes(y = nTweeters, colour = "N tweeters")) +
     facet_grid(ba_tweetType ~ .) +
