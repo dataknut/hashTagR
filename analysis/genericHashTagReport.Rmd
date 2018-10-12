@@ -361,7 +361,7 @@ linePlot <- ggplot2::ggplot(plotDT[maxCount > threshold], aes(x = ba_obsDate, y 
   scale_x_date(date_breaks = "1 day", date_labels = "%a %d %b %Y") +
   theme(legend.position = "none") +
   theme(legend.title = element_blank()) +
-  labs(caption = paste0(dataCap),
+  labs(caption = dataCap,
        x = "Date",
        y = "Cumulative count per day"
   )
@@ -380,7 +380,7 @@ ggplot2::ggplot(plotDT[count > threshold], aes(x = htCleanOr, y = count, fill = 
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.5)) +
   theme(legend.position = "none") +
   theme(legend.title = element_blank()) +
-  labs(caption = paste0(dataCap,"\nOnly count > 30 shown"),
+  labs(caption = dataCap,
        x = "hashtag",
        y = "Count to date"
   )
