@@ -56,7 +56,7 @@ myUtils::loadLibraries(reqLibs)
 ```
 
 ```{r set parameters}
-dPath <- "~/Data/twitter/"
+dPath <- "~/Data/twitter/boty2018/"
 hashTags <- params$hashTags
 searchStrng <- params$searchString
 timeZone <- "Pacific/Auckland"
@@ -319,8 +319,8 @@ kableExtra::kable(caption = "Top 20 hashtags",
   kable_styling()
 ```
 
-```{r setPlotThreshold}
-threshold <- 30
+```{r setTileThreshold}
+threshold <- 10
 ```
 
 Figure \@ref(fig:plotHashtags) plots the daily occurence of these hashtags after removing variants of `r searchString` and selecting only those which have more than `r threshold` mentions on any day. For clarity tweets and re-tweets are aggregated. See Section \@ref(problems) for the problems with this #hashTag counting approach.
@@ -358,6 +358,11 @@ ggplot2::ggplot(htTabDT[count > threshold], aes(x = ba_obsDate, y = htClean, fil
 So, who's gonna win? No idea.
 
 There are _a lot_ of problems with this approach (see Section \@ref(problems)) but if the hashtags have any predictive value at all then Figure \@ref(fig:cumulativeHtCounts) should be an indicator of the direction of travel (watch for lines of apparently dis-similar hashtags where the macron fix has failed) and Figure \@ref(fig:htCountsTodate) shows the totals to date.
+
+```{r setCumulativeThreshold}
+threshold <- 30
+```
+
 
 Figure \@ref(fig:cumulativeHtCounts) uses [plotly](https://plot.ly/r/) to avoid having to render a large legend - just hover over the lines to see who is who...
 

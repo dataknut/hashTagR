@@ -20,7 +20,7 @@ projLoc <- myUtils::findParentDirectory("hashTagR") # <- project location
 hashtags <- c("birdoftheyear", "boty") # a list of the hashtags to search for - see ?search_tweets
 searchString <- hashTagR::createSearchFromTags(hashtags)
 
-oDfile <- paste0("~/Data/twitter/tw_", searchString,"_", lubridate::now(),".csv") # <- data file
+oDfile <- paste0("~/Data/twitter/boty2018/tw_", searchString,"_", lubridate::now(),".csv") # <- data file
 ofile <- paste0(projLoc, "/docs/boty2018.html") # <- html output file
 explHashTag <- 'https://twitter.com/hashtag/birdoftheyear' # <- explanatory link for the hashtag
 pubUrl <- paste0("https://dataknut.github.io/hashTagR/", ofile) # <- where the results are published
