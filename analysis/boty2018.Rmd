@@ -88,9 +88,9 @@ See:
  
 # Purpose
 
-I've not been in NZ at this time of year before so `r params$hashtag` is a whole new cultural experience.
+I've not been in NZ at this time of year before so `r params$hashTags` is a whole new cultural experience.
 
-The idea is to extract and visualise tweets and re-tweets of _`r params$hashtag`_ (see `r params$explHashTag` and the [Forest & Bird voting site](https://www.birdoftheyear.org.nz/)).
+The idea is to extract and visualise tweets and re-tweets of _`r params$hashTags`_ (see `r params$explHashTag` and the [Forest & Bird voting site](https://www.birdoftheyear.org.nz/)).
 
 Why? Err.... Just. Because.
 
