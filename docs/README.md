@@ -7,7 +7,7 @@ Does what it says on the tin...
 Recent stuff using https://github.com/mkearney/rtweet
 
  * NZ Climate Change and Business Conference 2018 [#edsclimatechat OR #ccbc18](https://dataknut.github.io/hashTagR/ccbc2018.html)
- * NZ [#BirdOfTheYear OR #boty](https://dataknut.github.io/hashTagR/birdOfTheYear2018.html)
+ * NZ [#BirdOfTheYear OR #boty](https://dataknut.github.io/hashTagR/boty2018.html)
  
 ## brokenCode
 
