@@ -144,6 +144,7 @@ The cleaned data used in the rest of this report has:
 
 ## Tweets and Tweeters over time
 
+Voting closed on Sunday 14th October with the [results announced](https://www.forestandbird.org.nz/resources/kereru-crowned-bird-year-2018) on Monday 15th.
 
 ```{r setCaptionTimeSeries}
 dataCap <- paste0("Source: Data collected from Twitter's REST API via rtweet",
@@ -402,6 +403,8 @@ ggplot2::ggplot(plotDT[count > threshold], aes(x = htCleanOr, y = count, fill = 
        y = "Count to date"
   )
 ```
+
+The official [results](https://www.forestandbird.org.nz/resources/kereru-crowned-bird-year-2018) show the kererū as the winner and the Kakī third after the Kākāpō :-)
 
 # Problems {#problems}
 
