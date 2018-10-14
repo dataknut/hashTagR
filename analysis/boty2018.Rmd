@@ -1,0 +1,439 @@
+---
+params:
+  hashTags : '' # the list of hashtags we searched for
+  searchString : '' # the string we searched for
+  explHashTag: '' # explanatory link for the searchString
+  pubUrl: '' # where the results are published
+title: 'Twitter hashtag analysis: `r params$searchString`'
+author: "Ben Anderson (b.anderson@soton.ac.uk, ben.anderson@otago.ac.nz, `@dataknut`)"
+date: 'Last run at: `r paste0(lubridate::now(), " (", Sys.timezone(), ")")`'
+output:
+  bookdown::html_document2:
+    keep_md: yes
+    number_sections: yes
+    self_contained: no
+    toc: yes
+    toc_float: yes
+    toc_depth: 3
+  bookdown::pdf_document2:
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+bibliography: '`r path.expand("~/bibliography.bib")`'
+---
+```{r knitrSetUp, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE) # do not echo code
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(fig_caption = TRUE)
+knitr::opts_chunk$set(fig_height = 6) # default, make it bigger to stretch vertical axis
+knitr::opts_chunk$set(fig_width = 8) # full width
+knitr::opts_chunk$set(tidy = TRUE) # tidy up code in case echo = TRUE
+```
+
+```{r codeSetup, include=FALSE}
+
+# Set start time ----
+startTime <- proc.time()
+
+# Libraries ----
+library(myUtils)
+
+# additional libs required by this code
+reqLibs <- c("ggplot2",  
+             "plotly",
+             "readr", 
+             "reshape2",
+             "stringr",
+             "knitr", 
+             "kableExtra",
+             "hashTagR"
+             )
+
+print(paste0("Loading the following libraries: ", reqLibs))
+# Use Luke's function to require/install/load
+myUtils::loadLibraries(reqLibs)
+```
+
+```{r set parameters}
+dPath <- "~/Data/twitter/"
+hashTags <- params$hashTags
+searchStrng <- params$searchString
+timeZone <- "Pacific/Auckland"
+```
+
+# TL;DR
+
+Just a bit of [dataknut](https://twitter.com/dataknut) fun woven around the [day job](http://www.energy.soton.ac.uk/tag/spatialec/).
+
+> You'll be wanting Section \@ref(cumulative) for the trending hashtags...
+
+# Terms of re-use
+
+## License
+
+[CC-BY](https://creativecommons.org/licenses/by/4.0/) unless otherwise noted.
+
+## Citation
+
+ * Anderson, B (`r lubridate::year(today())`) _Twitter hashtag analysis: `r searchString`_. Downloaded from: `r params$pubUrl`.
+
+## Code
+
+See:
+
+ * Code: https://github.com/dataknut/hashTagR/blob/master/analysis/genericHashTagReport.Rmd
+ * Code/report [history](https://github.com/dataknut/hashTagR/commits/master/analysis/genericHashTagReport.Rmd.Rmd)
+ * Raise an issue [here](https://github.com/dataknut/hashTagR/issues)
+ 
+# Purpose
+
+I've not been in NZ at this time of year before so `r params$hashtag` is a whole new cultural experience.
+
+The idea is to extract and visualise tweets and re-tweets of _`r params$hashtag`_ (see `r params$explHashTag` and the [Forest & Bird voting site](https://www.birdoftheyear.org.nz/)).
+
+Why? Err.... Just. Because.
+
+# How it works
+
+Code borrows extensively from https://github.com/mkearney/rtweet
+
+The analysis used `rtweet` to ask the Twitter search API to extract 'all' tweets containing the _`r searchString`_ hashtags in the '[recent](https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets)' twitterVerse. When a search is repeated the _same_ tweet can appear more than once if one of it's attributes (e.g. number of likes & re-tweets) has changed since the last search.
+
+The search was repeated irregularly throughout the time that voting was open.
+
+It is possible that not all relevant tweets have been extracted although it seems likely that we have captured most recent `human` tweeting which was the main intention. 
+
+Future work should instead use the Twitter [streaming API](https://dev.twitter.com/streaming/overview) to set up a proper siphon of relevant tweets throughout the relevant period.
+
+```{r load Data}
+# load from pre-collected ----
+message("Load from pre-collected data and check for duplicates")
+
+raw_twDT <- hashTagR::loadTweets(dPath, searchString) # we like data.tables
+
+# for testing
+# raw_twDT <- hashTagR::loadTweets(dPath, searchString) # we like data.tables
+
+
+# this data.table will have duplicate entries because:
+# 1. we may have run the search mutiple times
+# 2. the search results are dynamic - they can change if a tweet is liked, re-tweeted etc as this data is updated
+
+# we don't want duplicates, we just want the most recent tweet record by time of creation and screen_names
+
+rn <- nrow(raw_twDT)
+twDT <- unique(raw_twDT, fromLast = TRUE, by = c("created_at", "screen_name") ) # drop duplicates
+un <- nrow(twDT)
+
+twDT <- twDT[, created_at_local := lubridate::with_tz(created_at, tzone = timeZone)]
+twDT <- twDT[, ba_obsDate := lubridate::date(created_at_local)]
+twDT <- twDT[, ba_obsTime := hms::as.hms(created_at)] # this will auto-convert to local time
+
+```
+
+`r myUtils::tidyNum(rn - un)` duplicates of the <`created_at`><`screen_name`> tuple were removed from the original `r myUtils::tidyNum(rn)` extracted tweets. Note that the duplicates exist in the raw data and may be useful for analysis of the dynamics of re-tweeting etc over time.
+
+The cleaned data used in the rest of this report has:
+
+ * `r tidyNum(nrow(twDT))` tweets (including `r tidyNum(nrow(twDT[is_quote == "TRUE"]))` quotes and `r tidyNum(nrow(twDT[is_retweet == "TRUE"]))` re-tweets) 
+ * from `r tidyNum(uniqueN(twDT$screen_name))` tweeters 
+ * between `r min(twDT$created_at_local)` and `r max(twDT$created_at_local)` (`r timeZone`).
+
+# Analysis
+
+## Tweets and Tweeters over time
+
+
+```{r setCaptionTimeSeries}
+dataCap <- paste0("Source: Data collected from Twitter's REST API via rtweet",
+                  "\nAll (re)tweets and quotes containing ", searchString, 
+                    " from ",
+                      min(twDT$created_at_local),
+                    " to ",
+                    max(twDT$created_at_local),
+                  " (", timeZone, ")"
+                    )
+```
+
+```{r allDaysChart, fig.height=8, fig.width=9, fig.cap="Number of tweets and tweeters"}
+
+twDT <- twDT[, ba_tweetType := "Tweet"]
+twDT <- twDT[is_retweet == TRUE, ba_tweetType := "Re-tweet"]
+twDT <- twDT[is_quote == TRUE, ba_tweetType := "Quote"]
+twDT <- twDT[, obsDateHour := lubridate::floor_date(created_at_local, "hour")]
+
+plotDT <- twDT[, .(
+                 nTweets = .N,
+                 nTweeters = uniqueN(screen_name)
+               ), keyby = .(obsDateHour, ba_tweetType)
+               ]
+
+myPlot <- ggplot2::ggplot(plotDT, aes(x = obsDateHour)) +
+    geom_line(aes(y = nTweets, colour = "N tweets")) +
+    geom_line(aes(y = nTweeters, colour = "N tweeters")) +
+    facet_grid(ba_tweetType ~ .) +
+    scale_x_datetime(breaks ="1 day", date_labels = "%a %d %b %Y") +
+    theme(strip.text.y = element_text(size = 9, colour = "black", angle = 90)) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.5)) +
+    theme(legend.position = "bottom") +
+    theme(legend.title = element_blank()) +
+    labs(caption = dataCap,
+         x = "Date",
+         y = "Count"
+    )
+
+myPlot
+
+```
+
+Figure \@ref(fig:allDaysChart) shows the number of tweets and tweeters in the data extract by day. The quotes, tweets and re-tweets have been separated.
+
+If you are in New Zealand and you are wondering why there are no tweets `today` (`r lubridate::today()`) the answer is that twitter data (and these plots) are working in UTC and (y)our `today()` may not have started yet in UTC. Don't worry, all the tweets are here - it's just our old friend the timezone... :-)
+
+## Who's tweeting?
+
+Next we'll try by screen name.
+
+```{r screenNamesTile, fig.height=8,fig.cap="N tweets per day by screen name"}
+
+plotDT <- twDT[, 
+                    .(
+                      nTweets = .N
+                    ), by = .(screen_name, ba_obsDate)]
+
+tilePlot <- ggplot(plotDT, aes(x = ba_obsDate)) +
+    geom_tile(aes(y = screen_name, fill = nTweets)) +
+    theme(strip.text.y = element_text(size = 9, colour = "black", angle = 0)) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.5)) +
+    #scale_x_reverse() + # fix reverse plotting of long
+    scale_x_date(date_breaks = "1 day", date_labels = "%a %d %b %Y") +
+    scale_fill_gradient(low="green", high = "red") +
+    theme(legend.position = "bottom") +
+    theme(legend.title = element_blank()) +
+    labs(caption = dataCap,
+         x = "Date",
+         y = "Screen name"
+    )
+tilePlot
+```
+
+Figure \@ref(fig:screenNamesTile) is a really bad visualisation of all tweeters tweeting over time. Each row of pixels is a tweeter (the names are probably illegible) and a green dot indicates a few tweets in the given day while a red dot indicates a lot of tweets.
+
+So let's re-do that for the top 50 tweeters so we can see their tweetStreaks (tm)...
+
+Top tweeters:
+
+```{r topTweeters}
+allTweetersDT <- twDT[, .(nTweets = .N), by = screen_name][order(-nTweets)]
+
+kableExtra::kable(caption = "Top 15 tweeters (all days)", 
+                  head(allTweetersDT, 15)) %>%
+  kable_styling()
+```
+
+And their tweetStreaks are shown in Figure \@ref(fig:screenNameTop50)...
+
+```{r screenNameTop50, fig.height=8,fig.cap="N tweets per day by screen name (top 50, reverse alphabetical)"}
+myDataCap <- paste0(dataCap,
+                    "\nScreen names in reverse alphabetical order"
+                          )
+
+matchDT <- head(allTweetersDT,50)
+matchDT <- matchDT[, maxT := nTweets]
+setkey(matchDT, screen_name)
+setkey(twDT, screen_name)
+
+tempDT <- merge(twDT, matchDT)
+
+plotDT <- tempDT[matchDT, 
+                    .(
+                      nTweets = .N
+                    ), keyby = .(maxT,screen_name,ba_obsDate)]
+
+plotDT <- plotDT[order(plotDT$maxT,plotDT$screen_name)]
+
+myPlot <- ggplot(plotDT, aes(x = ba_obsDate)) +
+    geom_tile(aes(y = screen_name, fill = nTweets)) +
+    theme(strip.text.y = element_text(size = 9, colour = "black", angle = 0)) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.5)) +
+    scale_x_date(date_breaks = "1 day", date_labels = "%a %d %b %Y") +
+    scale_fill_gradient(low="green", high = "red") +
+    theme(legend.position = "bottom") +
+    theme(legend.title = element_blank()) +
+    labs(caption = myDataCap,
+         x = "Date",
+         y = "Screen name"
+    )
+
+myPlot 
+```
+
+Any twitterBots...?
+
+## Which hashtags are mentioned the most?
+
+This is very quick and dirty but... to calculate this we have to do a bit of string processing first.
+
+```{r processHTs}
+htDT <- twDT[!is.na(hashtags), .(hashtags, ba_obsDate, ba_tweetType)] # remove any tweets without hashtags. How can there be no hashtags when we searched on hashtags?
+
+# now string split them
+# https://stackoverflow.com/questions/33200179/dynamically-assign-number-of-splits-in-data-table-tstrsplit
+splits <- max(lengths(strsplit(htDT$hashtags, "|", , fixed=T)))
+htDT <- htDT[, paste0("ht", 1:splits) := tstrsplit(hashtags, "|", fixed=T)]
+# reshape the list
+htLongDT <- reshape2::melt(htDT, id=c("hashtags","ba_obsDate", "ba_tweetType"))
+# remove NA
+htLongDT <- htLongDT[!is.na(value)]
+message("We have ", nrow(htLongDT), " hashtags.")
+message("That's about ~ ", round(nrow(htLongDT)/nrow(twDT),2), " hashtags per tweet...")
+# process in steps to be clear
+htLongDT <- htLongDT[, htOrig := value]
+```
+
+This is how I have tidied the hashtags (make other suggestions [here](https://github.com/dataknut/hashTagR/issues?q=is%3Aissue+label%3A%23boty)):
+
+```{r tidyHashtags, echo=TRUE}
+# First we make everything lower case
+htLongDT <- htLongDT[, htLower := tolower(htOrig)] # lower case
+
+# Next we remove the macrons just in case
+# h/t: https://twitter.com/Thoughtfulnz/status/1046685305569345536
+htLongDT <- htLongDT[, htClean := stringr::str_replace_all(htLower,"[āēīōū]",myUtils::deMacron)]
+
+# Now remove 'team' from a string so that e.g. teamkaki == kaki
+htLongDT <- htLongDT[, htClean := gsub("team", "",htClean)]
+
+# Now remove variants on 'vote'
+htLongDT <- htLongDT[, htClean := gsub("vote4", "",htClean)]
+htLongDT <- htLongDT[, htClean := gsub("vote", "",htClean)]
+```
+
+Table \@ref(tab:tweetTable) shows the total count of each #hashtag by (re)tweet type. With thanks to [David Hood](https://twitter.com/Thoughtfulnz/status/1046685305569345536) for code to help make sure that kakī == kaki ([etc](https://kupu.maori.nz/about/macrons-keyboard-setup)).
+
+
+```{r tweetTable}
+kableExtra::kable(caption = "Top 20 hashtags",
+                  head(htLongDT[, .(count = .N), by = .(hashTag = htClean, type = ba_tweetType)][order(-count)],20)) %>%
+  kable_styling()
+```
+
+```{r setPlotThreshold}
+threshold <- 30
+```
+
+Figure \@ref(fig:plotHashtags) plots the daily occurence of these hashtags after removing variants of `r searchString` and selecting only those which have more than `r threshold` mentions on any day. For clarity tweets and re-tweets are aggregated. See Section \@ref(problems) for the problems with this #hashTag counting approach.
+
+```{r plotHashtags, fig.height=8, fig.cap=paste0("Most mentioned #hashtags per day (only > ", threshold, " per day shown)")}
+
+# remove the hashtags we searched for
+testDT <- htLongDT
+
+for(n in 1:length(hashTags)){
+  testDT <- testDT[!(grepl(hashTags[n],htClean,ignore.case = TRUE))]
+}
+
+
+htTabDT <- testDT[, .(count = .N), keyby = .(ba_obsDate, htClean, ba_tweetType)]
+
+ggplot2::ggplot(htTabDT[count > threshold], aes(x = ba_obsDate, y = htClean, fill = count)) +
+  geom_tile() + 
+  theme(strip.text.y = element_text(size = 9, colour = "black", angle = 0)) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.5)) +
+  scale_x_date(date_breaks = "1 day", date_labels = "%a %d %b %Y") +
+  scale_fill_gradient(low="green", high = "red") +
+ # facet_grid(ba_tweetType ~ .) +
+  theme(legend.position = "bottom") +
+  theme(legend.title = element_blank()) +
+  labs(caption = paste0(dataCap,"\nReverse alphabetical order"),
+       x = "Date",
+       y = "Unique hashtags"
+  )
+  
+```
+
+# Most popular hashtags over time {#cumulative}
+
+So, who's gonna win? No idea.
+
+There are _a lot_ of problems with this approach (see Section \@ref(problems)) but if the hashtags have any predictive value at all then Figure \@ref(fig:cumulativeHtCounts) should be an indicator of the direction of travel (watch for lines of apparently dis-similar hashtags where the macron fix has failed) and Figure \@ref(fig:htCountsTodate) shows the totals to date.
+
+Figure \@ref(fig:cumulativeHtCounts) uses [plotly](https://plot.ly/r/) to avoid having to render a large legend - just hover over the lines to see who is who...
+
+```{r cumulativeHtCounts, fig.cap=paste0("Cumulative hashtag counts over time (only total count >", threshold, " shown)")}
+plotDT <- htTabDT[, .(count = sum(count)), keyby = .(ba_obsDate,htClean)]
+plotDT <- plotDT[, cumCount := cumsum(count), by = htClean]
+plotDT <- plotDT[, maxCount := max(cumCount), by = htClean] # so we can filter
+
+linePlot <- ggplot2::ggplot(plotDT[maxCount > threshold], aes(x = ba_obsDate, y = cumCount, colour = htClean)) +
+  geom_line() + 
+  theme(strip.text.y = element_text(size = 9, colour = "black", angle = 0)) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.5)) +
+  scale_x_date(date_breaks = "1 day", date_labels = "%a %d %b %Y") +
+  theme(legend.position = "none") +
+  theme(legend.title = element_blank()) +
+  labs(caption = dataCap,
+       x = "Date",
+       y = "Cumulative count per day"
+  )
+
+plotly::ggplotly(linePlot)
+```
+
+```{r htCountsTodate, fig.cap=paste0("Total hashtag counts to date (only total count > ", threshold, " shown)")}
+plotDT <- htTabDT[, .(count = sum(count)), keyby = .(htClean)]
+
+plotDT <- plotDT[, htCleanOr := reorder(htClean, -count)]
+
+ggplot2::ggplot(plotDT[count > threshold], aes(x = htCleanOr, y = count, fill = htCleanOr)) +
+  geom_col() + 
+  theme(strip.text.y = element_text(size = 9, colour = "black", angle = 0)) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.5)) +
+  theme(legend.position = "none") +
+  theme(legend.title = element_blank()) +
+  labs(caption = dataCap,
+       x = "hashtag",
+       y = "Count to date"
+  )
+```
+
+# Problems {#problems}
+
+Loads of them. But primarily:
+
+ * hashTags as indicators: 
+    * tweets mentioning birds without using a `#<birdName>` hashtag (like [this rather popular one](https://twitter.com/BillBailey/status/1046965452063293447)) will not show up. [#YMMV](https://dictionary.cambridge.org/dictionary/english/ymmv);
+    * there is no sentiment analysis so tweets saying "vote #takahe and the gannet gets it" look the same as "vote #takehe or the gannet gets it";
+ * removing the macrons: the tables and plots display incorrect Māori names. Unfortunately I have not found a way to put them back in the right words (and only the right words).
+
+# About
+
+As ever, [#YMMV](https://dictionary.cambridge.org/dictionary/english/ymmv).
+
+```{r check runtime}
+t <- proc.time() - startTime
+
+elapsed <- t[[3]]
+```
+
+Analysis completed in `r elapsed` seconds ( `r round(elapsed/60,2)` minutes) using [knitr](https://cran.r-project.org/package=knitr) in [RStudio](http://www.rstudio.com) with `r R.version.string` running on `r R.version$platform`.
+
+A special mention must go to `https://github.com/mkearney/rtweet` [@rtweet-package] for the twitter API interaction functions.
+
+Other R packages used:
+
+ * base R - for the basics [@baseR]
+ * data.table - for fast (big) data handling [@data.table]
+ * ggplot2 - for slick graphs [@ggplot2]
+ * plotly - for interactive graphs [@plotly]
+ * readr - for nice data loading [@readr]
+ * reshape2 - wide to long [@reshape2]
+ * rtweet - twitter API search [@rtweet-package]
+ * stringr - processing strings [@stringr]
+ * knitr, bookdown & kableExtra - to create this document [@knitr,@bookdown, @kableExtra]
+
+# References
+
+
+
