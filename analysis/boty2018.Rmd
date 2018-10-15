@@ -98,11 +98,11 @@ Why? Err.... Just. Because.
 
 Code borrows extensively from https://github.com/mkearney/rtweet
 
-The analysis used [rtweet](https://github.com/mkearney/rtweet) to ask the Twitter search API to extract 'all' tweets containing the _`r searchString`_ hashtags in the '[recent](https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets)' twitterVerse. When a search is repeated the _same_ tweet can appear more than once if one of it's attributes (e.g. number of likes & re-tweets) has changed since the last search.
+The analysis used [rtweet](https://github.com/mkearney/rtweet) to ask the free `Standard` Twitter search API to extract 'all' tweets containing the _`r searchString`_ hashtags in the freely available [recent (last 7 days)](https://developer.twitter.com/en/docs/tweets/search/overview) twitterVerse. When a search is repeated the _same_ tweet can appear more than once if one of it's attributes (e.g. number of likes & re-tweets) has changed since the last search.
 
 The search was repeated irregularly throughout the time that voting was open.
 
-It is possible that not all relevant tweets have been extracted although it seems likely that we have captured most recent `human` tweeting which was the main intention. 
+It is possible that not all relevant tweets have been extracted because the free (`Standard`) search does [not]((https://developer.twitter.com/en/docs/tweets/search/overview)) run over a complete archive of all tweets. 
 
 Future work should instead use the Twitter [streaming API](https://dev.twitter.com/streaming/overview) to set up a proper siphon of relevant tweets throughout the relevant period.
 
