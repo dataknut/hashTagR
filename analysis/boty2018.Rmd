@@ -374,7 +374,10 @@ plotDT <- htTabDT[, .(count = sum(count)), keyby = .(ba_obsDate,htClean)]
 plotDT <- plotDT[, cumCount := cumsum(count), by = htClean]
 plotDT <- plotDT[, maxCount := max(cumCount), by = htClean] # so we can filter
 
-linePlot <- ggplot2::ggplot(plotDT[maxCount > threshold], aes(x = ba_obsDate, y = cumCount, colour = htClean)) +
+plotDT <- plotDT[, hashtag := htClean]
+plotDT <- plotDT[, date := ba_obsDate]
+
+linePlot <- ggplot2::ggplot(plotDT[maxCount > threshold], aes(x = date, y = cumCount, colour = hashtag)) +
   geom_line() + 
   theme(strip.text.y = element_text(size = 9, colour = "black", angle = 0)) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.5)) +
