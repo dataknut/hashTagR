@@ -360,7 +360,7 @@ So, who's gonna win? No idea.
 
 There are _a lot_ of problems with this approach (see Section \@ref(problems)) but if the hashtags have any predictive value at all then Figure \@ref(fig:cumulativeHtCounts) should be an indicator of the direction of travel (watch for lines of apparently dis-similar hashtags where the macron fix has failed) and Figure \@ref(fig:htCountsTodate) shows the totals to date.
 
-The official [results](https://www.forestandbird.org.nz/resources/kereru-crowned-bird-year-2018) show the kererū as the winner and the Kakī third after the Kākāpō.
+The official [results](https://www.forestandbird.org.nz/resources/kereru-crowned-bird-year-2018) show the Kererū as the winner and the Kakī third after the Kākāpō.
 
 ```{r setCumulativeThreshold}
 threshold <- 30
