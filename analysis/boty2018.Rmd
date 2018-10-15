@@ -98,7 +98,7 @@ Why? Err.... Just. Because.
 
 Code borrows extensively from https://github.com/mkearney/rtweet
 
-The analysis used `rtweet` to ask the Twitter search API to extract 'all' tweets containing the _`r searchString`_ hashtags in the '[recent](https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets)' twitterVerse. When a search is repeated the _same_ tweet can appear more than once if one of it's attributes (e.g. number of likes & re-tweets) has changed since the last search.
+The analysis used [rtweet](https://github.com/mkearney/rtweet) to ask the Twitter search API to extract 'all' tweets containing the _`r searchString`_ hashtags in the '[recent](https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets)' twitterVerse. When a search is repeated the _same_ tweet can appear more than once if one of it's attributes (e.g. number of likes & re-tweets) has changed since the last search.
 
 The search was repeated irregularly throughout the time that voting was open.
 
@@ -431,7 +431,7 @@ elapsed <- t[[3]]
 
 Analysis completed in `r elapsed` seconds ( `r round(elapsed/60,2)` minutes) using [knitr](https://cran.r-project.org/package=knitr) in [RStudio](http://www.rstudio.com) with `r R.version.string` running on `r R.version$platform`.
 
-A special mention must go to `https://github.com/mkearney/rtweet` [@rtweet-package] for the twitter API interaction functions.
+A special mention must go to [rtweet](https://github.com/mkearney/rtweet) [@rtweet-package] for the twitter API interaction functions.
 
 Other R packages used:
 
