@@ -126,7 +126,7 @@ rn <- nrow(raw_twDT)
 twDT <- unique(raw_twDT, fromLast = TRUE, by = c("created_at", "screen_name") ) # drop duplicates
 un <- nrow(twDT)
 
-twDT <- twDT[, created_at_local := lubridate::with_tz(created_at, tzone = timeZone)]
+twDT <- twDT[, created_at_local := lubridate::with_tz(created_at, tzone = timeZone)] # beware - running this outside NZ will lead to strange graphs
 twDT <- twDT[, ba_obsDate := lubridate::date(created_at_local)]
 twDT <- twDT[, ba_obsTime := hms::as.hms(created_at)] # this will auto-convert to local time
 
@@ -139,18 +139,6 @@ The cleaned data used in the rest of this report has:
  * `r tidyNum(nrow(twDT))` tweets (including `r tidyNum(nrow(twDT[is_quote == "TRUE"]))` quotes and `r tidyNum(nrow(twDT[is_retweet == "TRUE"]))` re-tweets) 
  * from `r tidyNum(uniqueN(twDT$screen_name))` tweeters 
  * between `r min(twDT$created_at_local)` and `r max(twDT$created_at_local)` (`r timeZone`).
-
-If we just select the period from 29/9/2018 to 16/10/2018:
-
-```{r FnBRequest}
-
-dt <- twDT[lubridate::date(created_at_local) >= "2018-09-29" &
-             lubridate::date(created_at_local) <= "2018-10-16"]
-
-```
-
- * `r tidyNum(nrow(dt))` tweets (including `r tidyNum(nrow(dt[is_quote == "TRUE"]))` quotes and `r tidyNum(nrow(dt[is_retweet == "TRUE"]))` re-tweets) 
- * from `r tidyNum(uniqueN(dt$screen_name))` tweeters
 
 # Analysis
 
