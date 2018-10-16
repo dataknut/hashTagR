@@ -140,6 +140,18 @@ The cleaned data used in the rest of this report has:
  * from `r tidyNum(uniqueN(twDT$screen_name))` tweeters 
  * between `r min(twDT$created_at_local)` and `r max(twDT$created_at_local)` (`r timeZone`).
 
+If we just select the period from 29/9/2018 to 16/10/2018:
+
+```{r FnBRequest}
+
+dt <- twDT[lubridate::date(created_at_local) >= "2018-09-29" &
+             lubridate::date(created_at_local) <= "2018-10-16"]
+
+```
+
+ * `r tidyNum(nrow(dt))` tweets (including `r tidyNum(nrow(dt[is_quote == "TRUE"]))` quotes and `r tidyNum(nrow(dt[is_retweet == "TRUE"]))` re-tweets) 
+ * from `r tidyNum(uniqueN(dt$screen_name))` tweeters
+
 # Analysis
 
 ## Tweets and Tweeters over time
