@@ -9,35 +9,40 @@ library(readr)
 library(hashTagR)
 library(myUtils)
 
-# some of the tweet extracts appear to be malformed. But which?
+
 hashtags <- c("birdoftheyear", "boty") # a list of the hashtags to search for - see ?search_tweets
 searchString <- hashTagR::createSearchFromTags(hashtags)
 path <- "~/Data/twitter/boty2018/"
+iPath <- path.expand(paste0(path, "raw/"))
+oPath <- path.expand(paste0(path, "extracts/"))
 
-message("Load from pre-collected data")
+message("Load from pre-collected data stored in ", iPath ," using: ", searchString)
 
-raw_twDT <- hashTagR::loadTweets(path, searchString) # we like data.tables
+# this code uses the function to load them
+raw_twDT <- hashTagR::loadTweets(iPath,searchString)
 
+# process them
+twDT <- hashTagR::processTweets(raw_twDT)
 
-rn <- nrow(raw_twDT)
-twDT <- unique(raw_twDT) # drop any exact duplicates
-un <- nrow(twDT)
+message("Retained ", myUtils::tidyNum(nrow(twDT)), " unique search results of the ", 
+        myUtils::tidyNum(nrow(raw_twDT)) , " downloaded" )
 
-message("Retained ", myUtils::tidyNum(un), " unique tweets of the ", myUtils::tidyNum(rn) , " downloaded" )
-
-message("There are ",  myUtils::tidyNum(uniqueN(twDT$status_id)), " unique status_ids in this dataset")
-
-message("If there are more unique status_ids than tweets then we have duplicated tweets. This is usually because the tweet id record has been updated in some way")
-
-oFile <- path.expand(paste0(path, searchString, "_unique.csv")) # set output file name
+# save unique search results ----
+oFile <- path.expand(paste0(oPath, searchString, "_noDups.csv")) # set output file name
 
 data.table::fwrite(twDT, oFile) # save data
 cmd <- paste0("gzip -f '", oFile,"'")
 
 try(system(cmd)) # include ' or it breaks on spaces
 
-#myUtils::gzipIt(oFile)
+# save the unique set of tweets (ignoring dynamic attributes such as likes etc) ----
+utwDT <- unique(twDT, by = c("status_id") ) # drop duplicates
 
+oFile <- path.expand(paste0(oPath, searchString, "_uniqueTweets.csv")) # set output file name
 
+data.table::fwrite(utwDT, oFile) # save data
+cmd <- paste0("gzip -f '", oFile,"'")
 
+try(system(cmd)) # include ' or it breaks on spaces
 
+message("Done")
