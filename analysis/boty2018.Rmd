@@ -56,9 +56,9 @@ myUtils::loadLibraries(reqLibs)
 ```
 
 ```{r set parameters}
-dPath <- "~/Data/twitter/boty2018/"
+dPath <- "~/Data/twitter/boty2018/raw/"
 hashTags <- params$hashTags
-searchStrng <- params$searchString
+searchString <- params$searchString
 timeZone <- "Pacific/Auckland"
 ```
 
@@ -110,11 +110,13 @@ Future work should instead use the Twitter [streaming API](https://dev.twitter.c
 # load from pre-collected ----
 message("Load from pre-collected data and check for duplicates")
 
-raw_twDT <- hashTagR::loadTweets(dPath, searchString) # we like data.tables
+# this code uses the function to load them
+raw_twDT <- hashTagR::loadTweets(dPath,searchString)
+
+# process them
+twNoDupsDT <- hashTagR::processTweets(raw_twDT)
 
 # for testing
-# raw_twDT <- hashTagR::loadTweets(dPath, searchString) # we like data.tables
-
 
 # this data.table will have duplicate entries because:
 # 1. we may have run the search mutiple times
@@ -122,13 +124,19 @@ raw_twDT <- hashTagR::loadTweets(dPath, searchString) # we like data.tables
 
 # we don't want duplicates, we just want the most recent tweet record by time of creation and screen_names
 
-rn <- nrow(raw_twDT)
+rn <- nrow(twNoDupsDT)
 twDT <- unique(raw_twDT, fromLast = TRUE, by = c("created_at", "screen_name") ) # drop duplicates
 un <- nrow(twDT)
 
 twDT <- twDT[, created_at_local := lubridate::with_tz(created_at, tzone = timeZone)] # beware - running this outside NZ will lead to strange graphs
 twDT <- twDT[, ba_obsDate := lubridate::date(created_at_local)]
 twDT <- twDT[, ba_obsTime := hms::as.hms(created_at)] # this will auto-convert to local time
+
+
+twDT <- twDT[, ba_tweetType := "Tweet"]
+twDT <- twDT[is_retweet == TRUE, ba_tweetType := "Re-tweet"]
+twDT <- twDT[is_quote == TRUE, ba_tweetType := "Quote"]
+twDT <- twDT[, obsDateHour := lubridate::floor_date(created_at_local, "hour")]
 
 ```
 
@@ -159,10 +167,6 @@ dataCap <- paste0("Source: Data collected from Twitter's REST API via rtweet",
 
 ```{r allDaysChart, fig.height=8, fig.width=9, fig.cap="Number of tweets and tweeters"}
 
-twDT <- twDT[, ba_tweetType := "Tweet"]
-twDT <- twDT[is_retweet == TRUE, ba_tweetType := "Re-tweet"]
-twDT <- twDT[is_quote == TRUE, ba_tweetType := "Quote"]
-twDT <- twDT[, obsDateHour := lubridate::floor_date(created_at_local, "hour")]
 
 plotDT <- twDT[, .(
                  nTweets = .N,
