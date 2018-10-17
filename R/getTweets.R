@@ -36,73 +36,53 @@ saveTweets <- function(string,ofile, n = 18000){
 #'   If there are matches, rbinds them all into a tbl, gives feedback and returns the tbl as a data.table
 #'   for further fun.
 #'
-#'   Note that list.files() is recursive by default. This can lead to large search times if you start it at
-#'   the top of a file structure. Use wisely.
+#'   Note that list.files() is NOT recursive so it will search only in the path given.
 #'
 #' @param path place to look for saved file - gets passed to list.files()
 #' @param pattern the pattern to match - passed to list.files()
-#' @param recursive use recursively (default = TRUE)
 #'
 #' @import readr
 #' @import data.table
+#' @import R.utils
+#' @import bit64
 #'
 #' @author Ben Anderson, \email{b.anderson@@soton.ac.uk}
 #' @export
 #' @family tweets
 #'
 
-loadTweets <- function(path, pattern, recursive = TRUE){
-  fileList <- list.files(path = path, pattern = pattern, # use to filter e.g. 1m from 30s files
-                      recursive = recursive)
+loadTweets <- function(path, pattern){
+  fileList <- list.files(path = path, pattern = pattern) # assume 
   if(length(fileList) > 0){
     fListDT <- data.table::as.data.table(fileList)
-    fListDT <- fListDT[, fullPath := paste0(path, fileList)]
-    tbl <- do.call(rbind,
-                   lapply(fListDT$fullPath,
-                          function(f)
-                            readr::read_csv(path.expand(f),
-                                            progress = FALSE) # switch off progress
-
-                   )
-    )
+    fListDT <- fListDT[, fullPath := path.expand(paste0(path, fileList))]
+    # fread stops mid-way through some files
+    # dt <- rbindlist(lapply(fListDT$fullPath, data.table::fread), use.names=TRUE, fill=TRUE) # mega fast but no fancy data type parsing
+    dt <- rbindlist(lapply(fListDT$fullPath,
+                            function(f)
+                              data.table::as.data.table(readr::read_csv(f,
+                                                                        progress = FALSE)
+                                                        )
+                            ), fill = TRUE
+                     )
+    # memory issue?
+    # tbl <- do.call(rbind,
+    #                lapply(fListDT$fullPath,
+    #                       function(f)
+    #                         readr::read_csv(f,
+    #                                         progress = FALSE) # switch off progress
+    # 
+    #                )
+    # )
     fb <-paste0("Found ", nrow(fListDT), " files matching ",
                 pattern, " in ",
             path)
     print(fb)
-    return(data.table::as.data.table(tbl))
+    return(dt)
   } else {
     fb <- paste0("Didn't find any files matching ",
-            string, " in ",
+                 pattern, " in ",
             path)
     print(fb)
   }
 }
-
-#' Convert a list of hashtags to a Twitter search string
-#' 
-#' It's usually easier to keep the hashtags you want to search for in an R list. This function
-#' creates a proper API search using the operator you specify.
-#' 
-#' Do not include # in the list elements as this will be added automatically
-#' 
-#' @param ht the list of tags created using (e.g.) hashTags <- c("tag1", "tag2")
-#' @param op how to combine hashtag strings, default = OR
-#'
-#' @author Ben Anderson, \email{banderson@@soton.ac.uk}
-#' @export
-#' @family tweets
-
-createSearchFromTags <- function(ht, op = "OR"){
-  if(length(ht) == 0){
-    message("Nothing in the hasthtag list")
-  } else { # at least 1 hashtag
-    ss <- paste0("#",ht[1])
-    if(length(ht) > 1){ # at least 2
-      for(n in 2:length(ht)){
-        ss <- paste0(ss, " ", op, " #", ht[n]) 
-      }
-    }
-    return(ss)
-  }
-}
-
