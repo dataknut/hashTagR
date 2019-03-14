@@ -37,7 +37,7 @@ knitr::opts_chunk$set(tidy = TRUE) # tidy up code in case echo = TRUE
 startTime <- proc.time()
 
 # Libraries ----
-library(myUtils)
+library(dkUtils)
 
 # additional libs required by this code
 reqLibs <- c("ggplot2",  
@@ -52,7 +52,7 @@ reqLibs <- c("ggplot2",
 
 print(paste0("Loading the following libraries: ", reqLibs))
 # Use Luke's function to require/install/load
-myUtils::loadLibraries(reqLibs)
+dkUtils::loadLibraries(reqLibs)
 ```
 
 ```{r set parameters}
@@ -119,9 +119,9 @@ raw_twDT <- hashTagR::loadTweets(dPath, searchString) # we like data.tables
 rn <- nrow(raw_twDT)
 twDT <- unique(raw_twDT, fromLast = TRUE, by = c("created_at", "screen_name") ) # drop duplicates
 un <- nrow(twDT)
-message("Returning ", myUtils::tidyNum(un),
+message("Returning ", dkUtils::tidyNum(un),
         " tweets after dropping ",
-        myUtils::tidyNum(rn - un),
+        dkUtils::tidyNum(rn - un),
         " duplicates.")
 
 twDT <- twDT[, created_at_local := lubridate::with_tz(created_at, tzone = timeZone)]
@@ -296,7 +296,7 @@ htLongDT <- htLongDT[, htLower := tolower(htOrig)] # lower case
 
 # Next we remove the macrons just in case
 # h/t: https://twitter.com/Thoughtfulnz/status/1046685305569345536
-htLongDT <- htLongDT[, htClean := stringr::str_replace_all(htLower,"[āēīōū]",myUtils::deMacron)]
+htLongDT <- htLongDT[, htClean := stringr::str_replace_all(htLower,"[āēīōū]",dkUtils::deMacron)]
 
 # we might need to do other things here depending on the the context
 ```
@@ -342,6 +342,56 @@ ggplot2::ggplot(htTabDT[count > threshold], aes(x = ba_obsDate, y = htClean, fil
        y = "Unique hashtags"
   )
   
+```
+
+## Location (lat/long)
+We wanted to make a nice map but sadly we see that most tweets have no lat/long set.
+
+```{r latLongPlot}
+plotDT <- twDT[, 
+                    .(
+                      nTweets = .N
+                    ), by = .(geo_coords)]
+kable(cap="All logged lat/long values",
+      plotDT)
+
+plotDT <- twDT[, 
+                    .(
+                      nTweets = .N
+                    ), by = .(coords_coords)]
+kable(cap="All logged coord values",
+      plotDT)
+```
+
+## Location (textual)
+
+This appears to be pulled from the user's profile although it may also be a 'guestimate' of current location.
+
+Top country locations for tweets:
+
+```{r tweetCountries}
+t <- twDT[, .(nTweets = .N), by = location][order(-nTweets)]
+kable(caption = "Top 15 locations for tweeting",
+      head(t, 15)
+      )
+```
+
+Top locations for tweeters:
+
+```{r tweeterLocations}
+t <- twDT[, .(nTweeters = uniqueN(screen_name)), by = location][order(-nTweeters)]
+kable(caption = "Top 15 locations for tweeters",
+      head(t, 15)
+      )
+```
+
+Now try the full place name - rarely available.
+
+```{r tweetPlace}
+t <- twDT[, .(nTweets = .N), by = place_full_name][order(-nTweets)]
+kable(caption = "Top 15 locations for tweeting",
+      head(t, 15)
+      )
 ```
 
 # Most popular hashtags over time {#cumulative}
@@ -408,7 +458,7 @@ elapsed <- t[[3]]
 
 Analysis completed in `r elapsed` seconds ( `r round(elapsed/60,2)` minutes) using [knitr](https://cran.r-project.org/package=knitr) in [RStudio](http://www.rstudio.com) with `r R.version.string` running on `r R.version$platform`.
 
-A special mention must go to `https://github.com/mkearney/rtweet` [@rtweet-package] for the twitter API interaction functions.
+A special mention must go to `https://github.com/mkearney/rtweet` [@rtweet] for the twitter API interaction functions.
 
 Other R packages used:
 
@@ -418,7 +468,7 @@ Other R packages used:
  * plotly - for interactive graphs [@plotly]
  * readr - for nice data loading [@readr]
  * reshape2 - wide to long [@reshape2]
- * rtweet - twitter API search [@rtweet-package]
+ * rtweet - twitter API search [@rtweet]
  * stringr - processing strings [@stringr]
  * knitr, bookdown & kableExtra - to create this document [@knitr,@bookdown, @kableExtra]
 
