@@ -15,7 +15,7 @@ dkUtils::loadLibraries(reqLibs)
 
 # --- set params ----
 projLoc <- dkUtils::findParentDirectory("hashTagR")
-refresh <- 1 # 0 to skip data refresh
+refresh <- 0 # 0 to skip data refresh
 goGit <- 0 # 0 to skip git commit - breaks on UoS RStudio
 
 projLoc <- myUtils::findParentDirectory("hashTagR") # <- project location
@@ -56,7 +56,7 @@ rmarkdown::render(input = rmdFile,
                   output_file = paste0(projLoc, "/docs/", ofile)
 )
 
-# > comit & push to git if set ----
+# > commit & push to git if set ----
 
 if(goGit){
   # construct git commit
