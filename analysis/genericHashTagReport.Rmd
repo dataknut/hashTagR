@@ -311,7 +311,7 @@ kableExtra::kable(caption = "Top 20 hashtags",
 ```
 
 ```{r setPlotThreshold}
-threshold <- 10
+threshold <- 100
 ```
 
 Figure \@ref(fig:plotHashtags) plots the daily occurence of these hashtags after removing variants of `r searchString` and selecting only those which have more than `r threshold` mentions on any day. For clarity tweets and re-tweets are aggregated. See Section \@ref(problems) for the problems with this #hashTag counting approach.
