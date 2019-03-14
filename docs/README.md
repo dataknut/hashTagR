@@ -6,7 +6,8 @@ Does what it says on the tin...
 
 Recent stuff using https://github.com/mkearney/rtweet
 
- * NZ [#BirdOfTheYear](birdOfTheYear2018.html)
+ * NZ Climate Change and Business Conference 2018 [#edsclimatechat OR #ccbc18](https://dataknut.github.io/hashTagR/ccbc2018.html)
+ * NZ [#BirdOfTheYear OR #boty](https://dataknut.github.io/hashTagR/boty2018.html)
  
 ## brokenCode
 
@@ -18,4 +19,4 @@ Older examples (analysis = OK) using tweetR:
 
 ## License
 
-[CC-BY-SA](https://creativecommons.org/licenses/by-sa/4.0/) unless otherwise noted.
+[CC-BY](https://creativecommons.org/licenses/by/4.0/) unless otherwise noted.

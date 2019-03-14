@@ -4,7 +4,7 @@ params:
   explHashTag: '' # <- explanatory link for the hashtag
   pubUrl: '' # <- where the results are published
 title: 'Twitter hashtag analysis: `r params$hashtag`'
-author: "Ben Anderson (`@dataknut`)"
+author: "Ben Anderson (b.anderson@soton.ac.uk, ben.anderson@otago.ac.nz, `@dataknut`)"
 date: 'Last run at: `r paste0(lubridate::now(), " (", Sys.timezone(), ")")`'
 output:
   bookdown::html_document2:
@@ -40,6 +40,7 @@ startTime <- proc.time()
 # additional libs required by this code
 reqLibs <- c("data.table",
              "ggplot2",  
+             "plotly",
              "readr", 
              "reshape2",
              "stringr",
@@ -49,7 +50,7 @@ reqLibs <- c("data.table",
 
 print(paste0("Loading the following libraries: ", reqLibs))
 # Use Luke's function to require/install/load
-hashTagR::loadLibraries(reqLibs)
+myUtils::loadLibraries(reqLibs)
 ```
 
 ```{r set parameters}
@@ -57,16 +58,30 @@ dPath <- "~/Data/twitter/"
 
 ```
 
+# TL;DR
+
+Just a bit of [dataknut](https://twitter.com/dataknut) fun woven around the [day job](http://www.energy.soton.ac.uk/tag/spatialec/).
+
+> You'll be wanting Section \@ref(cumulative) for the trending hashtags...
+
 # Terms of re-use
 
 ## License
 
-[CC-BY-SA](https://creativecommons.org/licenses/by-sa/4.0/) unless otherwise noted.
+[CC-BY](https://creativecommons.org/licenses/by/4.0/) unless otherwise noted.
 
 ## Citation
 
  * Anderson, B (`r lubridate::year(today())`) _Twitter hashtag analysis: `r params$hashtag`_. Downloaded from: `r params$pubUrl`.
 
+## Code
+
+See:
+
+ * Code: https://github.com/dataknut/hashTagR/blob/master/analysis/birdOfTheYear2018.Rmd
+ * Code/report [history](https://github.com/dataknut/hashTagR/commits/master/analysis/birdOfTheYear2018.Rmd)
+ * Raise an issue [here](https://github.com/dataknut/hashTagR/issues?q=is%3Aissue+label%3A%23boty)
+ 
 # Purpose
 
 I've not been in NZ at this time of year before so `r params$hashtag` is a whole new cultural experience.
@@ -88,7 +103,7 @@ It is therefore possible that not quite all tweets have been extracted although 
 message("Load from pre-collected data and check for duplicates")
 # https://github.com/dataknut/hashTagR/blob/master/dataProcessing/getBoTY.R
 # for testing params$hashtag <- "#birdoftheyear OR #boty"
-raw_twDT <- data.table::as.data.table(hashTagR::loadTweets(dPath, params$hashtag)) # we like data.tables
+raw_twDT <- hashTagR::loadTweets(dPath, params$hashtag) # we like data.tables
 
 # this data.table will have duplicate entries because:
 # 1. we may have run the search mutiple times
@@ -99,9 +114,9 @@ raw_twDT <- data.table::as.data.table(hashTagR::loadTweets(dPath, params$hashtag
 rn <- nrow(raw_twDT)
 twDT <- unique(raw_twDT, fromLast = TRUE, by = c("created_at", "screen_name") ) # drop duplicates
 un <- nrow(twDT)
-message("Returning ", hashTagR::tidyNum(un),
+message("Returning ", myUtils::tidyNum(un),
         " tweets after dropping ",
-        hashTagR::tidyNum(rn - un),
+        myUtils::tidyNum(rn - un),
         " duplicates.")
     
 twDT <- twDT[, ba_obsDate := lubridate::date(created_at)]
@@ -245,6 +260,7 @@ Any twitterBots...?
 
 ## Which birds are mentioned the most (by hashtag)
 
+This is very quick and dirty but... to calculate this we have to do a bit of string processing first.
 
 ```{r processHTs}
 htDT <- twDT[!is.na(hashtags), .(hashtags, ba_obsDate, ba_tweetType)] # remove any tweets without hashtags. How can there be no hashtags when we searched on hashtags?
@@ -261,22 +277,28 @@ message("We have ", nrow(htLongDT), " hashtags.")
 message("That's about ~ ", round(nrow(htLongDT)/nrow(twDT),2), " hashtags per tweet...")
 # process in steps to be clear
 htLongDT <- htLongDT[, htOrig := value]
-# so that TeamKakī == TeamKaki & takahe == takahē etc https://twitter.com/Thoughtfulnz/status/1046685305569345536
-
-htLongDT <- htLongDT[, htLower := tolower(htOrig)] # lower case
-
-# kakī != kaki
-deMacron <- function(original){
-  # with thanks to https://twitter.com/Thoughtfulnz/status/1047648312810033152
-  macron <- c("ā", "ē", "ī", "ō", "ū") # set macron vowels https://kupu.maori.nz/about/macrons-keyboard-setup
-  nonMacron <- c("a", "e", "i", "o", "u") # roman equiv
-  return(nonMacron[which(original == macron)])
-}
-
-htLongDT <- htLongDT[,htClean := stringr::str_replace_all(htLower,"[āēīōū]",deMacron)]
 ```
 
-This is very quick and dirty but... Table \@ref(tab:tweetTable) shows the total count of each #hashtag by (re)tweet type. With thanks to [David Hood](https://twitter.com/Thoughtfulnz/status/1046685305569345536) for code to help make sure that kakī == kaki ([etc](https://kupu.maori.nz/about/macrons-keyboard-setup)).
+This is how I have tidied the hashtags (make other suggestions [here](https://github.com/dataknut/hashTagR/issues?q=is%3Aissue+label%3A%23boty)):
+
+```{r tidyHashtags, echo=TRUE}
+# First we make everything lower case
+htLongDT <- htLongDT[, htLower := tolower(htOrig)] # lower case
+
+# Next we remove the macrons so that TeamKakī == TeamKaki & takahe == takahē etc 
+# h/t: https://twitter.com/Thoughtfulnz/status/1046685305569345536
+htLongDT <- htLongDT[, htClean := stringr::str_replace_all(htLower,"[āēīōū]",myUtils::deMacron)]
+
+# Now remove 'team' from a string so that e.g. teamkaki == kaki
+htLongDT <- htLongDT[, htClean := gsub("team", "",htClean)]
+
+# Now remove variants on 'vote'
+htLongDT <- htLongDT[, htClean := gsub("vote4", "",htClean)]
+htLongDT <- htLongDT[, htClean := gsub("vote", "",htClean)]
+
+```
+
+Table \@ref(tab:tweetTable) shows the total count of each #hashtag by (re)tweet type. With thanks to [David Hood](https://twitter.com/Thoughtfulnz/status/1046685305569345536) for code to help make sure that kakī == kaki ([etc](https://kupu.maori.nz/about/macrons-keyboard-setup)).
 
 
 ```{r tweetTable}
@@ -317,7 +339,7 @@ ggplot2::ggplot(htTabDT[count > threshold], aes(x = ba_obsDate, y = htClean, fil
 
 # So who's gonna win? {#cumulative}
 
-No idea. 
+No idea. Your vote is as good as [mine](https://twitter.com/dataknut) :-)
 
 There are _a lot_ of problems with this approach (see Section \@ref(problems)) but if the hashtags have any predictive value at all then Figure \@ref(fig:cumulativeHtCounts) should be an indicator of the direction of travel (watch for lines of apparently dis-similar hashtags where the macron fix has failed) and Figure \@ref(fig:htCountsTodate) shows the totals to date.
 
@@ -364,7 +386,9 @@ ggplot2::ggplot(plotDT[count > 30], aes(x = htCleanOr, y = count, fill = htClean
 
 Loads of them. But primarily:
 
- * hashTags as indicators: tweets mentioning birds without using a `#<birdName>` hashtag (like [this rather popular one](https://twitter.com/BillBailey/status/1046965452063293447)) will not show up. [#YMMV](https://dictionary.cambridge.org/dictionary/english/ymmv);
+ * hashTags as indicators: 
+    * tweets mentioning birds without using a `#<birdName>` hashtag (like [this rather popular one](https://twitter.com/BillBailey/status/1046965452063293447)) will not show up. [#YMMV](https://dictionary.cambridge.org/dictionary/english/ymmv);
+    * there is no sentiment analysis so tweets saying "vote #takahe and the gannet gets it" look the same as "vote #takehe or the gannet gets it";
  * removing the macrons: the tables and plots display incorrect Māori names. Unfortunately I have not found a way to put them back in the right words (and only the right words).
 
 # About
@@ -384,6 +408,7 @@ Other R packages used:
  * base R - for the basics [@baseR]
  * data.table - for fast (big) data handling [@data.table]
  * ggplot2 - for slick graphs [@ggplot2]
+ * plotly - for interactive graphs [@plotly]
  * readr - for nice data loading [@readr]
  * reshape2 - wide to long [@reshape2]
  * rtweet - twitter API search [@rtweet-package]

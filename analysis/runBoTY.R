@@ -3,35 +3,33 @@
 ####
 
 # --- load libraries ---
-library(hashTagR)
+library(myUtils)
 
 # libs required by this code (.Rmd will call others needed there)
-reqLibs <- c("rmarkdown", "bookdown", "rtweet", "lubridate", "data.table")
+reqLibs <- c("rmarkdown", "bookdown", "rtweet", "lubridate", "data.table", "hashTagR")
 
 print(paste0("Loading the following libraries: ", reqLibs))
 # Use Luke's function to require/install/load
-hashTagR::loadLibraries(reqLibs)
+myUtils::loadLibraries(reqLibs)
 
 # --- set params ----
-projLoc <- hashTagR::findParentDirectory("hashTagR")
-hashtag <- "#birdoftheyear OR #boty" # see ?search_tweets - capitals are ignored (I think)
-oDfile <- paste0("~/Data/twitter/tw_", hashtag,"_", lubridate::now(),".csv")
-ofile <- paste0(projLoc, "/docs/birdOfTheYear2018.html")
+refresh <- 0 # 0 to skip data refresh
+goGit <- 1 # 0 to skip git commit
+
+projLoc <- myUtils::findParentDirectory("hashTagR") # <- project location
+hashtag <- "#birdoftheyear OR #boty" # <- what to search for - see ?search_tweets - capitals are ignored (I think)
+oDfile <- paste0("~/Data/twitter/tw_", hashtag,"_", lubridate::now(),".csv") # <- data file
+ofile <- paste0(projLoc, "/docs/birdOfTheYear2018.html") # <- html output file
 explHashTag <- 'https://twitter.com/hashtag/birdoftheyear' # <- explanatory link for the hashtag
 pubUrl <- paste0("https://dataknut.github.io/hashTagR/", ofile) # <- where the results are published
-rmdFile <- paste0(projLoc, "/analysis/birdOfTheYear2018.Rmd")
+rmdFile <- paste0(projLoc, "/analysis/birdOfTheYear2018.Rmd") # <- the Rmd code to render
 
-
-# default code location - needed to load functions & parameters correctly so
-projLoc <- hashTagR::findParentDirectory("hashTagR")
-
-refresh <- 0 # 0 to skip data refresh
 
 # --- code ---
 
 if(refresh){
   dt <- hashTagR::saveTweets(hashtag, oDfile)
-  message("Retreived ", nrow(dt), " tweets and saved them to ", ofile)
+  message("Retreived ", nrow(dt), " tweets and saved them to ", oDfile)
 }
 
 rmarkdown::render(input = rmdFile,
@@ -40,11 +38,13 @@ rmarkdown::render(input = rmdFile,
                   output_file = ofile
 )
 
-# construct git commit
-cmsg <- paste0("'Latest #birdOfTheYear data refresh & replot: ", lubridate::now(), "'")
-gc <- paste0("git commit -a -m ", cmsg)
-try(system(gc))
-gpl <- "git pull"
-try(system(gpl))
-gpu <- "git push origin refs/heads/master"
-try(system(gpu))
+if(goGit){
+  # construct git commit
+  cmsg <- paste0("'Latest #birdOfTheYear data refresh & replot: ", lubridate::now(), "'")
+  gc <- paste0("git commit -a -m ", cmsg)
+  try(system(gc))
+  gpl <- "git pull"
+  try(system(gpl))
+  gpu <- "git push origin refs/heads/master"
+  try(system(gpu))
+}
