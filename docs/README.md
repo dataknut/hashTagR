@@ -8,6 +8,7 @@ Recent stuff using https://github.com/mkearney/rtweet
 
  * NZ Climate Change and Business Conference 2018 [#edsclimatechat OR #ccbc18](https://dataknut.github.io/hashTagR/ccbc2018.html)
  * NZ [#BirdOfTheYear OR #boty](https://dataknut.github.io/hashTagR/boty2018.html)
+ * Global [#schoolStrike4Climate](https://dataknut.github.io/hashTagR/schoolStrike4Climate_Report.html)
  
 ## brokenCode
 
