@@ -9,7 +9,7 @@ string <- "#schoolstrike4climate"
 # "#birdoftheyear OR #boty" # see ?search_tweets - capitals are ignored (I think)
 
 # set up access tokens
-source(path.expand("˜/twitterAuthHashTagR.R"))
+#source(path.expand("˜/twitterAuthHashTagR.R")) # why does source fail to find the file?
 
 ofile <- paste0("~/Data/twitter/tw_", string,"_", lubridate::now(),".csv")
 

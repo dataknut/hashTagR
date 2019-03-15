@@ -2,7 +2,7 @@
 # Master (make) file for documentation
 ####
 
-# --- load libraries ---
+# --- load libraries ----
 library(hashTagR)
 library(dkUtils)
 
@@ -13,9 +13,12 @@ print(paste0("Loading the following libraries: ", reqLibs))
 # Use Luke's function to require/install/load
 dkUtils::loadLibraries(reqLibs)
 
+# set up access tokens ----
+#source(path.expand("˜/twitterAuthHashTagR.R")) # why does source fail to find the file?
+
 # --- set params ----
 projLoc <- dkUtils::findParentDirectory("hashTagR")
-refresh <- 0 # 0 to skip data refresh
+refresh <- 1 # 0 to skip data refresh
 goGit <- 0 # 0 to skip git commit - breaks on UoS RStudio
 
 projLoc <- myUtils::findParentDirectory("hashTagR") # <- project location
