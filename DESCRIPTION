@@ -1,15 +1,16 @@
 Package: hashTagR
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Title: Gets, saves and processes tweets and hashtags
+Version: 0.1
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    person(given = "Ben",
+           family = "Anderson",
            role = c("aut", "cre"),
-           email = "first.last@example.com")
-Description: What the package does (one paragraph).
-License: What license it uses
+           email = "b.anderson@soton.ac.uk")
+Description: Misc functions for downloading and processing tweets and hashtags.
+License: MIT
 Encoding: UTF-8
 LazyData: true
+Depends: R.utils, bit64, data.table, lubridate, readr, reshape2, rtweet
 URL: https://github.com/dataknut/hashTagR
 BugReports: https://github.com/dataknut/hashTagR/issues
-RoxygenNote: 6.1.0
+RoxygenNote: 7.2.2

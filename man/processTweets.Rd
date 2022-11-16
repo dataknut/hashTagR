@@ -20,9 +20,11 @@ Removes exact duplicates
    Returns a cleaned data.table
 }
 \seealso{
-Other tweets: \code{\link{createSearchFromTags}},
-  \code{\link{getHashtags}}, \code{\link{loadTweets}},
-  \code{\link{saveTweets}}
+Other tweets: 
+\code{\link{createSearchFromTags}()},
+\code{\link{getHashtags}()},
+\code{\link{getTweets}()},
+\code{\link{loadTweets}()}
 }
 \author{
 Ben Anderson, \email{b.anderson@soton.ac.uk}

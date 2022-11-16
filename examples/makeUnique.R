@@ -2,13 +2,12 @@
 # This script creates a 'final' dataset of unique rows of data.
 
 # Note that this may include repeated tweet IDs because twitter data is dynamic - the re-tweeted
-# attritbutes may change over time (for example)
+# attributes may change over time (for example)
 
 library(data.table)
 library(readr)
 library(hashTagR)
-library(myUtils)
-
+library(dkUtils) # https://github.com/dataknut/dkUtils
 
 hashtags <- c("birdoftheyear", "boty") # a list of the hashtags to search for - see ?search_tweets
 searchString <- hashTagR::createSearchFromTags(hashtags)
@@ -24,8 +23,8 @@ raw_twDT <- hashTagR::loadTweets(iPath,searchString)
 # process them
 twDT <- hashTagR::processTweets(raw_twDT)
 
-message("Retained ", myUtils::tidyNum(nrow(twDT)), " unique search results of the ", 
-        myUtils::tidyNum(nrow(raw_twDT)) , " downloaded" )
+message("Retained ", dkUtils::tidyNum(nrow(twDT)), " unique search results of the ", 
+        dkUtils::tidyNum(nrow(raw_twDT)) , " downloaded" )
 
 # save unique search results ----
 oFile <- path.expand(paste0(oPath, searchString, "_noDups.csv")) # set output file name
