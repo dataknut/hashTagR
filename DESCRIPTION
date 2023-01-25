@@ -13,4 +13,4 @@ LazyData: true
 Depends: R.utils, bit64, data.table, lubridate, readr, reshape2, rtweet
 URL: https://github.com/dataknut/hashTagR
 BugReports: https://github.com/dataknut/hashTagR/issues
-RoxygenNote: 7.2.2
+RoxygenNote: 7.2.3
