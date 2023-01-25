@@ -4,12 +4,14 @@
 \alias{loadTweets}
 \title{Loads tweets that match a given search string from a pre-saved file}
 \usage{
-loadTweets(path, pattern)
+loadTweets(path, pattern, noisy = FALSE)
 }
 \arguments{
 \item{path}{place to look for saved file - gets passed to list.files()}
 
 \item{pattern}{the pattern to match - passed to list.files()}
+
+\item{noisy}{do we give feedback or not (default = FALSE)}
 }
 \description{
 \code{loadTweets} takes a string and loads all files in a given path which have this name using readr

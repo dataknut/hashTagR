@@ -11,6 +11,7 @@
 #'
 #' @param path place to look for saved file - gets passed to list.files()
 #' @param pattern the pattern to match - passed to list.files()
+#' @param noisy do we give feedback or not (default = FALSE)
 #'
 #' @import readr
 #' @import data.table
@@ -22,7 +23,7 @@
 #' @family tweets
 #'
 
-loadTweets <- function(path, pattern){
+loadTweets <- function(path, pattern, noisy = FALSE){
   fileList <- list.files(path = path, pattern = pattern) # assume 
   if(length(fileList) > 0){
     fListDT <- data.table::as.data.table(fileList)
@@ -49,12 +50,12 @@ loadTweets <- function(path, pattern){
     fb <-paste0("Found ", nrow(fListDT), " files matching ",
                 pattern, " in ",
                 path)
-    print(fb)
+    if(noisy){print(fb)}
     return(dt)
   } else {
     fb <- paste0("Didn't find any files matching ",
                  pattern, " in ",
                  path)
-    print(fb)
+    print(fb) # always print this to flag error
   }
 }
