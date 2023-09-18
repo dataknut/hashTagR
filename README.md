@@ -1,6 +1,8 @@
 # hashTagR
 Does what it says on the tin: Extracts and visualises twitter hashtags using https://github.com/mkearney/rtweet
 
+> NB: YMMV following Twitter's changes to search API access
+
 Examples:
 
 All at https://dataknut.github.io/hashTagR/
